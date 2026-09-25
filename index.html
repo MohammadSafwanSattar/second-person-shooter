@@ -1,0 +1,6129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Second Person Shooter</title>
+
+<style>
+
+/* ============================================================
+   GENERAL
+   ============================================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    background: #080808;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    user-select: none;
+
+    touch-action: none;
+}
+
+#game {
+
+    display: block;
+
+    position: fixed;
+
+    left: 0;
+    top: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    cursor: crosshair;
+}
+
+
+/* ============================================================
+   HUD
+   ============================================================ */
+
+#hud {
+
+    position: fixed;
+
+    left: 20px;
+    top: 20px;
+
+    z-index: 20;
+
+    color: white;
+
+    pointer-events: none;
+}
+
+#title {
+
+    font-size: 23px;
+
+    font-weight: bold;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 12px;
+
+    text-shadow:
+        2px 2px 4px black,
+        0 0 10px black;
+}
+
+.hudBox {
+
+    background:
+        rgba(0, 0, 0, 0.68);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.25);
+
+    padding:
+        9px 12px;
+
+    margin-bottom: 7px;
+
+    min-width: 210px;
+
+    border-radius: 5px;
+}
+
+.hudLabel {
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+
+    opacity: 0.75;
+
+    margin-bottom: 5px;
+}
+
+
+/* ============================================================
+   HEALTH BAR
+   ============================================================ */
+
+.healthBar {
+
+    width: 180px;
+
+    height: 15px;
+
+    background: #351010;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.3);
+
+    overflow: hidden;
+
+    border-radius: 3px;
+}
+
+#healthFill {
+
+    width: 100%;
+
+    height: 100%;
+
+    background: #36d45a;
+
+    transition:
+        width 0.1s linear;
+}
+
+
+/* ============================================================
+   AMMO
+   ============================================================ */
+
+#ammo {
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+}
+
+
+/* ============================================================
+   WEAPON HUD
+   ============================================================ */
+
+#weaponName {
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    margin-bottom: 4px;
+}
+
+#weaponStats {
+
+    font-size: 11px;
+
+    line-height: 1.5;
+
+    opacity: 0.75;
+}
+
+
+/* ============================================================
+   SCORE
+   ============================================================ */
+
+#score {
+
+    font-size: 17px;
+
+    font-weight: bold;
+}
+
+
+/* ============================================================
+   ENEMY HUD
+   ============================================================ */
+
+#enemyHUD {
+
+    position: fixed;
+
+    right: 20px;
+    top: 20px;
+
+    z-index: 20;
+
+    color: white;
+
+    pointer-events: none;
+
+    text-align: right;
+}
+
+#enemyHUD .hudBox {
+
+    min-width: 230px;
+}
+
+#enemyWeapon {
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    margin-bottom: 6px;
+}
+
+#enemyHealthBar {
+
+    width: 210px;
+
+    height: 17px;
+
+    background: #351010;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.35);
+
+    overflow: hidden;
+
+    border-radius: 3px;
+
+    margin-left: auto;
+}
+
+#enemyHealthFill {
+
+    width: 100%;
+
+    height: 100%;
+
+    background: #e53935;
+
+    transition:
+        width 0.1s linear;
+}
+
+
+/* ============================================================
+   CONTROLS
+   ============================================================ */
+
+#controls {
+
+    position: fixed;
+
+    left: 50%;
+
+    bottom: 17px;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 20;
+
+    padding:
+        8px 14px;
+
+    color:
+        rgba(255,255,255,0.8);
+
+    background:
+        rgba(0,0,0,0.55);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.18);
+
+    border-radius: 5px;
+
+    font-size: 12px;
+
+    letter-spacing: 1px;
+
+    pointer-events: none;
+
+    text-align: center;
+}
+
+
+/* ============================================================
+   RELOAD CIRCLE
+   ============================================================ */
+
+#reloadUI {
+
+    position: fixed;
+
+    left: 50%;
+
+    bottom: 90px;
+
+    transform:
+        translateX(-50%);
+
+    width: 110px;
+
+    height: 110px;
+
+    z-index: 100;
+
+    pointer-events: none;
+
+    display: none;
+}
+
+#reloadUI svg {
+
+    width: 110px;
+
+    height: 110px;
+
+    transform:
+        rotate(-90deg);
+
+    filter:
+        drop-shadow(
+            0 0 7px
+            rgba(255,255,255,0.55)
+        );
+}
+
+#reloadBackground {
+
+    fill:
+        rgba(0,0,0,0.82);
+
+    stroke:
+        rgba(255,255,255,0.25);
+
+    stroke-width: 8;
+}
+
+#reloadProgress {
+
+    fill: none;
+
+    stroke: white;
+
+    stroke-width: 8;
+
+    stroke-linecap: round;
+
+    stroke-dasharray: 276.46;
+
+    stroke-dashoffset: 276.46;
+}
+
+#reloadNumber {
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 110px;
+    height: 110px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+
+    font-size: 21px;
+
+    font-weight: bold;
+
+    text-shadow:
+        2px 2px 4px black,
+        0 0 8px black;
+}
+
+#reloadLabel {
+
+    position: absolute;
+
+    left: 0;
+
+    bottom: -24px;
+
+    width: 110px;
+
+    text-align: center;
+
+    color: white;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    text-shadow:
+        2px 2px 4px black;
+}
+
+
+/* ============================================================
+   WEAPON SELECTION
+   ============================================================ */
+
+#weaponSelect {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 150;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        rgba(0,0,0,0.82);
+
+    color: white;
+
+    text-align: center;
+}
+
+#weaponSelect h1 {
+
+    margin: 0 0 8px;
+
+    font-size: 40px;
+
+    letter-spacing: 5px;
+
+    text-shadow:
+        0 0 12px black;
+}
+
+#weaponTimer {
+
+    font-size: 38px;
+
+    font-weight: bold;
+
+    margin-bottom: 22px;
+}
+
+#weaponInstruction {
+
+    font-size: 14px;
+
+    opacity: 0.75;
+
+    margin-bottom: 18px;
+}
+
+.weaponGrid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, 1fr);
+
+    gap: 12px;
+
+    width: min(
+        920px,
+        92vw
+    );
+}
+
+.weaponCard {
+
+    padding: 18px 10px;
+
+    background:
+        rgba(25,25,25,0.95);
+
+    border:
+        2px solid
+        rgba(255,255,255,0.2);
+
+    border-radius: 8px;
+
+    transition:
+        transform 0.1s,
+        background 0.1s,
+        border-color 0.1s;
+
+    cursor: pointer;
+}
+
+.weaponCard:hover {
+
+    transform:
+        translateY(-5px);
+
+    background:
+        rgba(55,55,55,0.95);
+
+    border-color:
+        white;
+}
+
+.weaponNumber {
+
+    font-size: 28px;
+
+    font-weight: bold;
+
+    margin-bottom: 8px;
+}
+
+.weaponCard h2 {
+
+    font-size: 17px;
+
+    margin: 4px 0 10px;
+}
+
+.weaponCard p {
+
+    font-size: 11px;
+
+    line-height: 1.55;
+
+    opacity: 0.72;
+
+    margin: 0;
+}
+
+
+/* ============================================================
+   SELECTED WEAPON
+   ============================================================ */
+
+#selectedWeaponText {
+
+    margin-top: 20px;
+
+    min-height: 22px;
+
+    font-size: 15px;
+
+    font-weight: bold;
+}
+
+
+/* ============================================================
+   GAME OVER
+   ============================================================ */
+
+#gameOver {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 200;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-direction: column;
+
+    background:
+        rgba(0,0,0,0.75);
+
+    color: white;
+
+    text-align: center;
+}
+
+#gameOver h1 {
+
+    margin:
+        0 0 15px;
+
+    font-size: 56px;
+
+    letter-spacing: 6px;
+}
+
+#gameOver p {
+
+    font-size: 20px;
+
+    margin: 5px;
+}
+
+#restartButton {
+
+    margin-top: 25px;
+
+    padding:
+        12px 28px;
+
+    background: white;
+
+    color: black;
+
+    border: none;
+
+    border-radius: 4px;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+#restartButton:hover {
+    background: #dddddd;
+}
+
+.gameOverNavButton {
+    margin-top: 25px;
+    padding: 12px 22px;
+    background: #252525;
+    color: white;
+    border: 1px solid #777;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.gameOverNavButton:hover {
+    background: #444;
+}
+
+
+/* ============================================================
+   RESPONSIVE WEAPON SELECT
+   ============================================================ */
+
+@media (max-width: 800px) {
+
+    .weaponGrid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+        max-height: 60vh;
+
+        overflow-y: auto;
+    }
+
+    #weaponSelect h1 {
+
+        font-size: 28px;
+    }
+
+    #weaponTimer {
+
+        font-size: 30px;
+    }
+
+}
+
+
+/* MAIN MENU + DIFFICULTY */
+.menuOverlay {
+    position: fixed; inset: 0; z-index: 300;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px; background: radial-gradient(circle, #202020, #050505 72%);
+    color: #fff; text-align: center;
+}
+.menuOverlay h1 { margin: 0; font-size: clamp(30px, 5vw, 58px); letter-spacing: 5px; }
+.menuOverlay p { color: #aaa; margin: 0 0 10px; }
+.menuButton {
+    width: min(300px, 80vw); padding: 16px 24px; border: 1px solid #777;
+    border-radius: 6px; background: #171717; color: white; font-size: 18px;
+    font-weight: bold; letter-spacing: 2px; cursor: pointer; transition: .15s;
+}
+.menuButton:hover { background: #303030; border-color: #fff; transform: translateY(-2px); }
+.menuNote { font-size: 12px; color: #777; max-width: 340px; line-height: 1.5; }
+
+/* MOBILE CONTROLS */
+#mobileControls { display: none; }
+@media (pointer: coarse), (max-width: 800px) {
+    #mobileControls { display: block; position: fixed; inset: 0; z-index: 120; pointer-events: none; }
+    #moveStick {
+        position: absolute; left: 24px; bottom: 28px; width: 128px; height: 128px;
+        border: 2px solid rgba(255,255,255,.3); border-radius: 50%; background: rgba(0,0,0,.2);
+        pointer-events: auto; touch-action: none;
+    }
+    #moveStickKnob {
+        position: absolute; left: 37px; top: 37px; width: 50px; height: 50px; border-radius: 50%;
+        background: rgba(142,231,255,.55); border: 2px solid rgba(255,255,255,.7); pointer-events: none;
+    }
+    .mobileAction {
+        position: absolute; border: 2px solid rgba(255,255,255,.55); border-radius: 50%; color: #fff;
+        background: rgba(25,75,95,.55); font-size: 12px; font-weight: bold; letter-spacing: 1px; pointer-events: auto;
+        touch-action: none;
+    }
+    #fireHint { right: 22px; bottom: 27px; width: 115px; height: 115px; display: grid; place-items: center; opacity: .75; pointer-events: none; }
+    #mobileReload { right: 122px; bottom: 128px; width: 58px; height: 58px; background: rgba(70,70,70,.7); font-size: 10px; }
+    #controls { display: none; }
+    #hud { left: 10px; top: 10px; transform: scale(.8); transform-origin: top left; }
+    #enemyHUD { right: 10px; top: 10px; transform: scale(.8); transform-origin: top right; }
+    #title { font-size: 16px; letter-spacing: 2px; }
+    .hudBox { min-width: 160px; padding: 6px 8px; margin-bottom: 4px; }
+    #enemyHUD .hudBox { min-width: 165px; }
+    .healthBar { width: 135px; }
+    #enemyHealthBar { width: 145px; }
+}
+
+/* CHARACTER CUSTOMIZATION */
+#customizationMenu { gap: 14px; overflow-y: auto; padding: 28px 16px; }
+#customizationMenu h1 { font-size: clamp(26px, 4vw, 44px); }
+.customizationPanel {
+    width: min(520px, 92vw); padding: 20px; border: 1px solid #444;
+    border-radius: 10px; background: rgba(16,16,16,0.9); text-align: left;
+}
+.characterPreview {
+    width: min(220px, 55vw); height: 150px; border: 1px solid #3d3d3d;
+    border-radius: 10px; background: radial-gradient(circle at 50% 35%, #303030, #101010 72%);
+}
+.customizationRow { margin: 0 0 17px; }
+.customizationRow:last-child { margin-bottom: 0; }
+.customizationLabel { display: block; margin-bottom: 9px; color: #bdbdbd; font-size: 11px; font-weight: bold; letter-spacing: 2px; }
+.swatchGroup { display: flex; flex-wrap: wrap; gap: 10px; }
+.colorSwatch {
+    width: 42px; height: 42px; border: 3px solid transparent; border-radius: 50%;
+    background: var(--swatch); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3);
+    cursor: pointer; transition: transform .15s, border-color .15s;
+}
+.colorSwatch:hover { transform: scale(1.1); }
+.colorSwatch.selected { border-color: #fff; }
+.customizationActions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.customizationActions .menuButton { width: min(240px, 42vw); }
+.statGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+.statCard {
+    min-height: 118px; padding: 12px 8px; border: 1px solid #555; border-radius: 7px;
+    background: #181818; color: #ddd; cursor: pointer; text-align: center; transition: .15s;
+}
+.statCard:hover, .statCard.selected { border-color: #8ee7ff; background: #20323b; }
+.statCard strong { display: block; margin-bottom: 7px; color: #fff; font-size: 13px; letter-spacing: 1px; }
+.statCard span { color: #aebbc0; font-size: 10px; line-height: 1.4; }
+.weaponSkinGrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.weaponSkinButton {
+    min-height: 52px; padding: 6px 3px; border: 2px solid transparent; border-radius: 6px;
+    background: var(--skin); color: white; cursor: pointer; font-size: 9px; font-weight: bold;
+    letter-spacing: .5px; text-shadow: 0 1px 2px #000;
+}
+.weaponSkinButton:hover, .weaponSkinButton.selected { border-color: #fff; transform: translateY(-2px); }
+@media (max-width: 420px) { .statGrid { grid-template-columns: 1fr; } .statCard { min-height: auto; } }
+
+</style>
+</head>
+
+
+<body>
+
+
+<canvas id="game"></canvas>
+
+
+<!-- ============================================================
+     PLAYER HUD
+     ============================================================ -->
+
+<div id="hud">
+
+    <div id="title">
+        SECOND PERSON SHOOTER
+    </div>
+
+
+    <div class="hudBox">
+
+        <div class="hudLabel">
+            HEALTH
+        </div>
+
+        <div class="healthBar">
+
+            <div id="healthFill"></div>
+
+        </div>
+
+    </div>
+
+
+    <div class="hudBox">
+
+        <div class="hudLabel">
+            WEAPON
+        </div>
+
+        <div id="weaponName">
+            -
+        </div>
+
+        <div id="weaponStats">
+            Choose a weapon
+        </div>
+
+    </div>
+
+
+    <div class="hudBox">
+
+        <div class="hudLabel">
+            AMMO
+        </div>
+
+        <div id="ammo">
+            0 / 0
+        </div>
+
+    </div>
+
+
+    <div class="hudBox">
+
+        <div class="hudLabel">
+            SCORE
+        </div>
+
+        <div id="score">
+            0
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     ENEMY HUD
+     ============================================================ -->
+
+<div id="enemyHUD">
+
+    <div class="hudBox">
+
+        <div class="hudLabel">
+            ENEMY WEAPON
+        </div>
+
+        <div id="enemyWeapon">
+            -
+        </div>
+
+
+        <div class="hudLabel">
+            ENEMY HEALTH
+        </div>
+
+        <div id="enemyHealthBar">
+
+            <div id="enemyHealthFill"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     RELOAD UI
+     ============================================================ -->
+
+<div id="reloadUI">
+
+    <svg viewBox="0 0 100 100">
+
+        <circle
+            id="reloadBackground"
+            cx="50"
+            cy="50"
+            r="44">
+        </circle>
+
+        <circle
+            id="reloadProgress"
+            cx="50"
+            cy="50"
+            r="44">
+        </circle>
+
+    </svg>
+
+    <div id="reloadNumber">
+        0.0
+    </div>
+
+    <div id="reloadLabel">
+        RELOADING
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     WEAPON SELECTION
+     ============================================================ -->
+
+
+<div id="mainMenu" class="menuOverlay">
+    <h1>SECOND PERSON SHOOTER</h1>
+    <p>SELECT GAME MODE</p>
+    <button class="menuButton" id="onlineModeButton">ONLINE MODE</button>
+    <button class="menuButton" id="offlineModeButton">OFFLINE MODE</button>
+    <button class="menuButton" id="customizeButton">CHARACTER</button>
+    <div class="menuNote">Online 1v1 automatically pairs you with the next player in the queue.</div>
+</div>
+
+<div id="onlineMenu" class="menuOverlay" style="display:none;">
+    <h1>ONLINE 1V1</h1>
+    <p id="onlineStatus">CONNECTING...</p>
+    <div class="menuNote">Keep this window open while we find an opponent.</div>
+    <button class="menuButton" id="cancelOnlineButton" style="font-size:14px;">CANCEL</button>
+</div>
+
+<div id="customizationMenu" class="menuOverlay" style="display:none;">
+    <h1>YOUR CHARACTER</h1>
+    <p>CHOOSE YOUR LOADOUT STYLE</p>
+    <canvas id="characterPreview" class="characterPreview" width="440" height="300" aria-label="Character appearance preview"></canvas>
+    <div class="customizationPanel">
+        <div class="customizationRow">
+            <span class="customizationLabel">ARMOR SKIN</span>
+            <div class="swatchGroup" data-customization="armor">
+                <button class="colorSwatch selected" style="--swatch:#247fc1" data-color="#247fc1" aria-label="Blue armor"></button>
+                <button class="colorSwatch" style="--swatch:#c64545" data-color="#c64545" aria-label="Red armor"></button>
+                <button class="colorSwatch" style="--swatch:#38a66a" data-color="#38a66a" aria-label="Green armor"></button>
+                <button class="colorSwatch" style="--swatch:#875bc5" data-color="#875bc5" aria-label="Purple armor"></button>
+                <button class="colorSwatch" style="--swatch:#d38b31" data-color="#d38b31" aria-label="Orange armor"></button>
+            </div>
+        </div>
+        <div class="customizationRow">
+            <span class="customizationLabel">SKIN TONE</span>
+            <div class="swatchGroup" data-customization="skin">
+                <button class="colorSwatch selected" style="--swatch:#d99a70" data-color="#d99a70" aria-label="Medium skin tone"></button>
+                <button class="colorSwatch" style="--swatch:#f0c4a4" data-color="#f0c4a4" aria-label="Light skin tone"></button>
+                <button class="colorSwatch" style="--swatch:#ad704f" data-color="#ad704f" aria-label="Tan skin tone"></button>
+                <button class="colorSwatch" style="--swatch:#76452f" data-color="#76452f" aria-label="Dark skin tone"></button>
+            </div>
+        </div>
+        <div class="customizationRow">
+            <span class="customizationLabel">HELMET COLOR</span>
+            <div class="swatchGroup" data-customization="helmet">
+                <button class="colorSwatch selected" style="--swatch:#18212a" data-color="#18212a" aria-label="Black helmet"></button>
+                <button class="colorSwatch" style="--swatch:#e8e8e8" data-color="#e8e8e8" aria-label="White helmet"></button>
+                <button class="colorSwatch" style="--swatch:#486b42" data-color="#486b42" aria-label="Olive helmet"></button>
+                <button class="colorSwatch" style="--swatch:#6c3c29" data-color="#6c3c29" aria-label="Brown helmet"></button>
+            </div>
+        </div>
+    </div>
+    <div class="customizationPanel">
+        <div class="customizationRow">
+            <span class="customizationLabel">CHARACTER STATS</span>
+            <div class="statGrid">
+                <button class="statCard" data-stat-class="vanguard"><strong>VANGUARD</strong><span>+35 health<br>Slower reload</span></button>
+                <button class="statCard selected" data-stat-class="balanced"><strong>BALANCED</strong><span>All-round fighter<br>No trade-offs</span></button>
+                <button class="statCard" data-stat-class="scout"><strong>SCOUT</strong><span>Fast movement<br>Lower health, quick reload</span></button>
+            </div>
+        </div>
+    </div>
+    <div class="customizationPanel">
+        <div class="customizationRow">
+            <span class="customizationLabel">WEAPON SKIN</span>
+            <div class="weaponSkinGrid">
+                <button class="weaponSkinButton selected" style="--skin:linear-gradient(135deg,#4c5661,#111418)" data-weapon-skin="obsidian">OBSIDIAN</button>
+                <button class="weaponSkinButton" style="--skin:linear-gradient(135deg,#0d7384,#d2ffff)" data-weapon-skin="neon">NEON</button>
+                <button class="weaponSkinButton" style="--skin:linear-gradient(135deg,#8a6113,#ffe691)" data-weapon-skin="gold">GOLD</button>
+                <button class="weaponSkinButton" style="--skin:linear-gradient(135deg,#376995,#e5f6ff)" data-weapon-skin="arctic">ARCTIC</button>
+                <button class="weaponSkinButton" style="--skin:linear-gradient(135deg,#711d31,#ff758b)" data-weapon-skin="crimson">CRIMSON</button>
+            </div>
+        </div>
+    </div>
+    <div class="customizationActions">
+        <button class="menuButton" id="saveCustomizationButton">SAVE LOOK</button>
+        <button class="menuButton" id="backFromCustomization" style="font-size:14px;">BACK</button>
+    </div>
+</div>
+
+<div id="difficultyMenu" class="menuOverlay" style="display:none;">
+    <h1>OFFLINE MODE</h1>
+    <p>CHOOSE DIFFICULTY</p>
+    <button class="menuButton" data-difficulty="easy">EASY</button>
+    <button class="menuButton" data-difficulty="medium">MEDIUM</button>
+    <button class="menuButton" data-difficulty="hard">HARD</button>
+    <button class="menuButton" id="backToMainMenu" style="font-size:14px;">BACK</button>
+</div>
+
+<div id="weaponSelect">
+
+    <h1>
+        CHOOSE YOUR WEAPON
+    </h1>
+
+    <div id="weaponTimer">
+        5.0
+    </div>
+
+    <div id="weaponInstruction">
+        Press 1–5 or click a weapon
+    </div>
+
+
+    <div class="weaponGrid">
+
+
+        <!-- PISTOL -->
+
+        <div
+            class="weaponCard"
+            data-weapon="pistol"
+        >
+
+            <div class="weaponNumber">
+                1
+            </div>
+
+            <h2>
+                PISTOL
+            </h2>
+
+            <p>
+                Damage: 25<br>
+                Ammo: 12<br>
+                Balanced fire rate<br>
+                Reload: 2.0 sec
+            </p>
+
+        </div>
+
+
+        <!-- SMG -->
+
+        <div
+            class="weaponCard"
+            data-weapon="smg"
+        >
+
+            <div class="weaponNumber">
+                2
+            </div>
+
+            <h2>
+                SMG
+            </h2>
+
+            <p>
+                Damage: 12<br>
+                Ammo: 30<br>
+                Very fast fire rate<br>
+                Reload: 2.5 sec
+            </p>
+
+        </div>
+
+
+        <!-- RIFLE -->
+
+        <div
+            class="weaponCard"
+            data-weapon="rifle"
+        >
+
+            <div class="weaponNumber">
+                3
+            </div>
+
+            <h2>
+                RIFLE
+            </h2>
+
+            <p>
+                Damage: 32<br>
+                Ammo: 20<br>
+                Fast fire rate<br>
+                Reload: 2.2 sec
+            </p>
+
+        </div>
+
+
+        <!-- SHOTGUN -->
+
+        <div
+            class="weaponCard"
+            data-weapon="shotgun"
+        >
+
+            <div class="weaponNumber">
+                4
+            </div>
+
+            <h2>
+                SHOTGUN
+            </h2>
+
+            <p>
+                7 pellets per shot<br>
+                10 damage each<br>
+                Wide spread<br>
+                Reload: 2.8 sec
+            </p>
+
+        </div>
+
+
+        <!-- SNIPER -->
+
+        <div
+            class="weaponCard"
+            data-weapon="sniper"
+        >
+
+            <div class="weaponNumber">
+                5
+            </div>
+
+            <h2>
+                SNIPER
+            </h2>
+
+            <p>
+                Damage: 100<br>
+                Ammo: 5<br>
+                Very slow fire rate<br>
+                Reload: 3.0 sec
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div id="selectedWeaponText">
+        No weapon selected
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     CONTROLS
+     ============================================================ -->
+
+<div id="controls">
+
+    W A S D — MOVE
+    &nbsp;&nbsp;
+    SHIFT — SPRINT
+    &nbsp;&nbsp;
+    MOUSE — AIM
+    &nbsp;&nbsp;
+    CLICK — SHOOT
+    &nbsp;&nbsp;
+    R — RELOAD
+
+</div>
+
+<div id="mobileControls" aria-label="Mobile game controls">
+    <div id="moveStick" aria-label="Move joystick"><div id="moveStickKnob"></div></div>
+    <div id="fireHint" class="mobileAction">AIM + FIRE</div>
+    <button id="mobileReload" class="mobileAction" aria-label="Reload weapon">RELOAD</button>
+</div>
+
+
+<!-- ============================================================
+     GAME OVER
+     ============================================================ -->
+
+<div id="gameOver">
+
+    <h1>
+        GAME OVER
+    </h1>
+
+    <p id="finalScore">
+        Score: 0
+    </p>
+
+    <div id="gameOverButtons" style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:20px;">
+        <button id="restartButton">NEW ROUND</button>
+        <button id="chooseAnotherModeButton" class="gameOverNavButton">CHOOSE ANOTHER MODE</button>
+        <button id="gameOverBackButton" class="gameOverNavButton">BACK</button>
+    </div>
+
+</div>
+
+
+<script>
+
+/* ============================================================
+   CANVAS
+   ============================================================ */
+
+const canvas =
+    document.getElementById("game");
+
+const ctx =
+    canvas.getContext("2d");
+
+
+function resizeCanvas() {
+
+    canvas.width =
+        window.innerWidth;
+
+    canvas.height =
+        window.innerHeight;
+
+}
+
+resizeCanvas();
+
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+
+/* ============================================================
+   HUD ELEMENTS
+   ============================================================ */
+
+const healthFill =
+    document.getElementById(
+        "healthFill"
+    );
+
+const enemyHealthFill =
+    document.getElementById(
+        "enemyHealthFill"
+    );
+
+const ammoText =
+    document.getElementById(
+        "ammo"
+    );
+
+const scoreText =
+    document.getElementById(
+        "score"
+    );
+
+const weaponName =
+    document.getElementById(
+        "weaponName"
+    );
+
+const weaponStats =
+    document.getElementById(
+        "weaponStats"
+    );
+
+const enemyWeaponText =
+    document.getElementById(
+        "enemyWeapon"
+    );
+
+const gameOverScreen =
+    document.getElementById(
+        "gameOver"
+    );
+
+const finalScore =
+    document.getElementById(
+        "finalScore"
+    );
+
+const restartButton =
+    document.getElementById(
+        "restartButton"
+    );
+
+
+/* ============================================================
+   RELOAD ELEMENTS
+   ============================================================ */
+
+const reloadUI =
+    document.getElementById(
+        "reloadUI"
+    );
+
+const reloadProgress =
+    document.getElementById(
+        "reloadProgress"
+    );
+
+const reloadNumber =
+    document.getElementById(
+        "reloadNumber"
+    );
+
+const reloadCircumference =
+    2 * Math.PI * 44;
+
+
+reloadProgress.style.strokeDasharray =
+    reloadCircumference;
+
+reloadProgress.style.strokeDashoffset =
+    reloadCircumference;
+
+
+/* ============================================================
+   WEAPON SELECTION ELEMENTS
+   ============================================================ */
+
+const weaponSelect =
+    document.getElementById(
+        "weaponSelect"
+    );
+
+const mainMenu = document.getElementById("mainMenu");
+const difficultyMenu = document.getElementById("difficultyMenu");
+const customizationMenu = document.getElementById("customizationMenu");
+const onlineMenu = document.getElementById("onlineMenu");
+const onlineStatus = document.getElementById("onlineStatus");
+let onlineSocket = null;
+let onlineMode = false;
+let onlineReady = false;
+let onlineRole = 1;
+const playerAppearance = {
+    armor: "#247fc1",
+    skin: "#d99a70",
+    helmet: "#18212a",
+    weaponSkin: "obsidian"
+};
+const weaponSkins = {
+    obsidian: { body: "#252a30", highlight: "#4c5661", barrel: "#111418", grip: "#17191c", accent: "#68727c" },
+    neon: { body: "#0e6577", highlight: "#8dffff", barrel: "#07313a", grip: "#0a414c", accent: "#d2ffff" },
+    gold: { body: "#9b6a14", highlight: "#ffe58a", barrel: "#5c3d09", grip: "#73500e", accent: "#fff0b0" },
+    arctic: { body: "#447da8", highlight: "#e7f8ff", barrel: "#1e425d", grip: "#315f80", accent: "#b9e7ff" },
+    crimson: { body: "#841f35", highlight: "#ff8b9d", barrel: "#46101d", grip: "#611526", accent: "#ffc2cb" }
+};
+const statClasses = {
+    vanguard: { maxHealth: 135, speed: 245, sprintSpeed: 385, reloadMultiplier: 1.12 },
+    balanced: { maxHealth: 100, speed: 270, sprintSpeed: 420, reloadMultiplier: 1 },
+    scout: { maxHealth: 85, speed: 320, sprintSpeed: 490, reloadMultiplier: 0.82 }
+};
+let selectedStatClass = "balanced";
+const characterPreview = document.getElementById("characterPreview");
+const characterPreviewCtx = characterPreview.getContext("2d");
+
+function drawCharacterPreview() {
+    const preview = characterPreviewCtx;
+    const armor = playerAppearance.armor;
+    const skin = playerAppearance.skin;
+    const helmet = playerAppearance.helmet;
+
+    preview.clearRect(0, 0, characterPreview.width, characterPreview.height);
+    preview.save();
+    preview.translate(characterPreview.width / 2, 166);
+    preview.scale(2.4, 2.4);
+
+    // Shadow
+    preview.fillStyle = "rgba(0,0,0,0.38)";
+    preview.beginPath();
+    preview.ellipse(0, 31, 32, 10, 0, 0, Math.PI * 2);
+    preview.fill();
+
+    // Legs and boots
+    preview.fillStyle = helmet;
+    preview.beginPath();
+    preview.roundRect(-16, 5, 11, 25, 5);
+    preview.roundRect(5, 5, 11, 25, 5);
+    preview.fill();
+    preview.fillStyle = "#101317";
+    preview.beginPath();
+    preview.roundRect(-18, 25, 14, 7, 3);
+    preview.roundRect(4, 25, 14, 7, 3);
+    preview.fill();
+
+    // Armor
+    preview.fillStyle = armor;
+    preview.beginPath();
+    preview.roundRect(-20, -16, 40, 30, 9);
+    preview.fill();
+    preview.strokeStyle = "rgba(255,255,255,0.58)";
+    preview.lineWidth = 2;
+    preview.beginPath();
+    preview.roundRect(-9, -7, 18, 13, 3);
+    preview.stroke();
+
+    // Neck, head, helmet, and visor
+    preview.fillStyle = skin;
+    preview.fillRect(-7, -21, 14, 8);
+    preview.beginPath();
+    preview.arc(0, -27, 14, 0, Math.PI * 2);
+    preview.fill();
+    preview.fillStyle = helmet;
+    preview.beginPath();
+    preview.arc(0, -30, 15, Math.PI, Math.PI * 2);
+    preview.lineTo(15, -28);
+    preview.lineTo(-15, -28);
+    preview.closePath();
+    preview.fill();
+    preview.fillStyle = "#8ee7ff";
+    preview.beginPath();
+    preview.roundRect(4, -33, 9, 5, 2);
+    preview.fill();
+
+    // Arms and the equipped weapon skin
+    preview.save();
+    preview.rotate(-0.16);
+    preview.strokeStyle = skin;
+    preview.lineWidth = 7;
+    preview.lineCap = "round";
+    preview.beginPath();
+    preview.moveTo(-15, -6);
+    preview.lineTo(-4, 1);
+    preview.lineTo(9, 0);
+    preview.moveTo(16, -6);
+    preview.lineTo(9, 1);
+    preview.lineTo(18, 0);
+    preview.stroke();
+
+    const previewFinish = weaponSkins[playerAppearance.weaponSkin];
+    preview.fillStyle = previewFinish.body;
+    preview.beginPath();
+    preview.roundRect(9, -5, 37, 10, 3);
+    preview.fill();
+    preview.fillStyle = previewFinish.highlight;
+    preview.fillRect(13, -3, 27, 2);
+    preview.fillStyle = previewFinish.barrel;
+    preview.fillRect(43, -2, 23, 5);
+    preview.fillStyle = previewFinish.grip;
+    preview.save();
+    preview.translate(22, 4);
+    preview.rotate(0.25);
+    preview.fillRect(-4, 0, 8, 14);
+    preview.restore();
+    preview.fillStyle = previewFinish.accent;
+    preview.fillRect(18, -6, 10, 2);
+    preview.restore();
+
+    preview.restore();
+}
+
+drawCharacterPreview();
+let selectedDifficulty = "medium";
+let enemyFireMultiplier = 0.78;
+
+function setDifficulty(level) {
+    selectedDifficulty = level;
+    if (level === "easy") {
+        enemy.speed = 155;
+        enemy.maxHealth = 130;
+        enemyFireMultiplier = 1.25;
+    } else if (level === "hard") {
+        enemy.speed = 275;
+        enemy.maxHealth = 300;
+        enemyFireMultiplier = 0.62;
+    } else {
+        enemy.speed = 210;
+        enemy.maxHealth = 200;
+        enemyFireMultiplier = 0.9;
+    }
+    enemy.health = enemy.maxHealth;
+}
+
+function showMainMenu() {
+    leaveOnlineMatch();
+    mainMenu.style.display = "flex";
+    difficultyMenu.style.display = "none";
+    customizationMenu.style.display = "none";
+    onlineMenu.style.display = "none";
+    weaponSelect.style.display = "none";
+    selectingWeapon = false;
+    gameOver = false;
+}
+
+function sendOnline(message) {
+    if (onlineSocket && onlineSocket.readyState === WebSocket.OPEN) {
+        onlineSocket.send(JSON.stringify(message));
+    }
+}
+
+function leaveOnlineMatch() {
+    onlineMode = false;
+    onlineReady = false;
+    if (onlineSocket) onlineSocket.close();
+    onlineSocket = null;
+}
+
+function connectOnlineMatch() {
+    leaveOnlineMatch();
+    onlineMode = true;
+    mainMenu.style.display = "none";
+    onlineMenu.style.display = "flex";
+    onlineStatus.textContent = "CONNECTING...";
+
+    const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+    onlineSocket = new WebSocket(protocol + "//" + location.host);
+
+    onlineSocket.addEventListener("open", function() {
+        onlineStatus.textContent = "FINDING OPPONENT...";
+    });
+
+    onlineSocket.addEventListener("message", function(event) {
+        const message = JSON.parse(event.data);
+        if (message.type === "waiting") onlineStatus.textContent = "WAITING FOR OPPONENT...";
+        if (message.type === "matched") {
+            onlineRole = message.role;
+            onlineReady = true;
+            onlineMenu.style.display = "none";
+            restartGame();
+        }
+        if (message.type === "state" && onlineReady) {
+            enemy.x = message.x;
+            enemy.y = message.y;
+            enemy.angle = message.angle;
+            enemy.health = message.health;
+            enemy.maxHealth = message.maxHealth;
+            enemy.weaponKey = message.weaponKey;
+            enemy.weapon = weapons[message.weaponKey] || weapons.pistol;
+            enemy.alive = message.alive;
+        }
+        if (message.type === "hit" && onlineReady) {
+            player.health = Math.max(0, player.health - message.damage);
+            if (player.health === 0) endGame();
+        }
+        if (message.type === "opponentLeft") {
+            onlineReady = false;
+            onlineStatus.textContent = "OPPONENT DISCONNECTED";
+            onlineMenu.style.display = "flex";
+        }
+    });
+
+    onlineSocket.addEventListener("error", function() {
+        onlineStatus.textContent = "SERVER UNAVAILABLE — START THE GAME SERVER FIRST";
+    });
+}
+
+document.getElementById("onlineModeButton").addEventListener("click", connectOnlineMatch);
+document.getElementById("cancelOnlineButton").addEventListener("click", showMainMenu);
+
+document.getElementById("offlineModeButton").addEventListener("click", function() {
+    mainMenu.style.display = "none";
+    difficultyMenu.style.display = "flex";
+});
+
+document.getElementById("customizeButton").addEventListener("click", function() {
+    mainMenu.style.display = "none";
+    customizationMenu.style.display = "flex";
+});
+
+document.querySelectorAll("[data-customization]").forEach(function(group) {
+    group.querySelectorAll(".colorSwatch").forEach(function(swatch) {
+        swatch.addEventListener("click", function() {
+            playerAppearance[group.dataset.customization] = swatch.dataset.color;
+            drawCharacterPreview();
+            group.querySelectorAll(".colorSwatch").forEach(function(option) {
+                option.classList.toggle("selected", option === swatch);
+            });
+        });
+    });
+});
+
+document.querySelectorAll("[data-stat-class]").forEach(function(card) {
+    card.addEventListener("click", function() {
+        selectedStatClass = card.dataset.statClass;
+        document.querySelectorAll("[data-stat-class]").forEach(function(option) {
+            option.classList.toggle("selected", option === card);
+        });
+    });
+});
+
+document.querySelectorAll("[data-weapon-skin]").forEach(function(button) {
+    button.addEventListener("click", function() {
+        playerAppearance.weaponSkin = button.dataset.weaponSkin;
+        drawCharacterPreview();
+        document.querySelectorAll("[data-weapon-skin]").forEach(function(option) {
+            option.classList.toggle("selected", option === button);
+        });
+    });
+});
+
+document.getElementById("saveCustomizationButton").addEventListener("click", showMainMenu);
+document.getElementById("backFromCustomization").addEventListener("click", showMainMenu);
+document.getElementById("backToMainMenu").addEventListener("click", showMainMenu);
+
+document.querySelectorAll("[data-difficulty]").forEach(function(button) {
+    button.addEventListener("click", function() {
+        setDifficulty(button.dataset.difficulty);
+        difficultyMenu.style.display = "none";
+        // Start a clean round so stale game-over/death state cannot carry
+        // over when the player changes difficulty.
+        restartGame();
+    });
+});
+
+const weaponTimer =
+    document.getElementById(
+        "weaponTimer"
+    );
+
+const selectedWeaponText =
+    document.getElementById(
+        "selectedWeaponText"
+    );
+
+
+/* ============================================================
+   WEAPONS
+   ============================================================ */
+
+const weapons = {
+
+    pistol: {
+
+        name: "PISTOL",
+
+        damage: 25,
+
+        maxAmmo: 12,
+
+        fireRate: 0.28,
+
+        reloadDuration: 2.0,
+
+        bulletSpeed: 950,
+
+        bulletRadius: 5,
+
+        pellets: 1,
+
+        spread: 0,
+
+        color: "#ffffff"
+
+    },
+
+
+    smg: {
+
+        name: "SMG",
+
+        damage: 12,
+
+        maxAmmo: 30,
+
+        fireRate: 0.09,
+
+        reloadDuration: 2.5,
+
+        bulletSpeed: 900,
+
+        bulletRadius: 4,
+
+        pellets: 1,
+
+        spread: 0.07,
+
+        color: "#ffe082"
+
+    },
+
+
+    rifle: {
+
+        name: "RIFLE",
+
+        damage: 32,
+
+        maxAmmo: 20,
+
+        fireRate: 0.18,
+
+        reloadDuration: 2.2,
+
+        bulletSpeed: 1100,
+
+        bulletRadius: 4,
+
+        pellets: 1,
+
+        spread: 0.025,
+
+        color: "#80d8ff"
+
+    },
+
+
+    shotgun: {
+
+        name: "SHOTGUN",
+
+        damage: 10,
+
+        maxAmmo: 5,
+
+        fireRate: 0.85,
+
+        reloadDuration: 2.8,
+
+        bulletSpeed: 850,
+
+        bulletRadius: 4,
+
+        pellets: 7,
+
+        spread: 0.42,
+
+        color: "#ffcc80"
+
+    },
+
+
+    sniper: {
+
+        name: "SNIPER",
+
+        damage: 100,
+
+        maxAmmo: 5,
+
+        fireRate: 1.25,
+
+        reloadDuration: 3.0,
+
+        bulletSpeed: 1500,
+
+        bulletRadius: 5,
+
+        pellets: 1,
+
+        spread: 0,
+
+        color: "#ffffff"
+
+    }
+
+};
+
+
+/* ============================================================
+   WORLD
+   ============================================================ */
+
+const world = {
+
+    width: 2400,
+
+    height: 1800
+
+};
+
+
+/* ============================================================
+   WALLS
+   ============================================================ */
+
+const walls = [
+
+    {
+        x: 300,
+        y: 250,
+        w: 500,
+        h: 70
+    },
+
+    {
+        x: 1050,
+        y: 180,
+        w: 70,
+        h: 480
+    },
+
+    {
+        x: 1450,
+        y: 250,
+        w: 500,
+        h: 70
+    },
+
+    {
+        x: 350,
+        y: 700,
+        w: 70,
+        h: 500
+    },
+
+    {
+        x: 700,
+        y: 650,
+        w: 450,
+        h: 70
+    },
+
+    {
+        x: 1300,
+        y: 650,
+        w: 70,
+        h: 500
+    },
+
+    {
+        x: 1550,
+        y: 850,
+        w: 500,
+        h: 70
+    },
+
+    {
+        x: 700,
+        y: 1250,
+        w: 70,
+        h: 350
+    },
+
+    {
+        x: 1050,
+        y: 1250,
+        w: 500,
+        h: 70
+    },
+
+    {
+        x: 1850,
+        y: 1150,
+        w: 70,
+        h: 400
+    }
+
+];
+
+
+/* ============================================================
+   PLAYER
+   ============================================================ */
+
+const player = {
+
+    x: 700,
+
+    y: 500,
+
+    radius: 25,
+
+    speed: 270,
+
+    sprintSpeed: 420,
+
+    health: 100,
+
+    maxHealth: 100,
+
+    ammo: 12,
+
+    maxAmmo: 12,
+
+    fireCooldown: 0,
+
+    reloadTimer: 0,
+
+    reloadDuration: 2,
+
+    angle: 0,
+
+    invulnerable: 0,
+
+    weaponKey: "pistol",
+
+    weapon: weapons.pistol
+
+};
+
+function applyCharacterStats() {
+    const stats = statClasses[selectedStatClass];
+    player.maxHealth = stats.maxHealth;
+    player.speed = stats.speed;
+    player.sprintSpeed = stats.sprintSpeed;
+    player.reloadDuration = player.weapon.reloadDuration * stats.reloadMultiplier;
+}
+
+
+/* ============================================================
+   ENEMY
+   ============================================================ */
+
+const enemy = {
+
+    x: 1750,
+
+    y: 1050,
+
+    radius: 32,
+
+    speed: 235,
+
+    health: 220,
+
+    maxHealth: 220,
+
+    fireCooldown: 0,
+
+    angle: 0,
+
+    strafeDirection: 1,
+
+    strafeTimer: 1,
+
+    alive: true,
+
+    weaponKey: "pistol",
+
+    weapon: weapons.pistol,
+
+    ammo: weapons.pistol.maxAmmo,
+
+    maxAmmo: weapons.pistol.maxAmmo,
+
+    reloadTimer: 0,
+
+    reloadDuration: weapons.pistol.reloadDuration
+
+};
+
+
+/* ============================================================
+   BULLETS
+   ============================================================ */
+
+let playerBullets = [];
+
+let enemyBullets = [];
+
+
+/* ============================================================
+   PARTICLES
+   ============================================================ */
+
+let particles = [];
+
+
+/* ============================================================
+   GAME STATE
+   ============================================================ */
+
+let score = 0;
+
+let gameOver = false;
+
+let mouseDown = false;
+
+
+/* ============================================================
+   WEAPON SELECTION STATE
+   ============================================================ */
+
+let selectingWeapon = true;
+
+let weaponSelectionTime = 5;
+
+let weaponSelectionTimer = 5;
+
+let playerHasSelectedWeapon = false;
+
+
+/* ============================================================
+   CAMERA
+   ============================================================ */
+
+const camera = {
+
+    x: 0,
+
+    y: 0,
+
+    smoothing: 0.15
+
+};
+
+
+/* ============================================================
+   MOUSE
+   ============================================================ */
+
+let mouse = {
+
+    x:
+        canvas.width / 2,
+
+    y:
+        canvas.height / 2
+
+};
+
+
+/* ============================================================
+   KEYBOARD
+   ============================================================ */
+
+const keys = {};
+
+
+window.addEventListener(
+    "keydown",
+    function(e) {
+
+        keys[
+            e.key.toLowerCase()
+        ] = true;
+
+
+        /* ----------------------------------------------------
+           WEAPON SELECTION
+           ---------------------------------------------------- */
+
+        if (
+            selectingWeapon
+        ) {
+
+            if (
+                e.key === "1"
+            ) {
+
+                chooseWeapon(
+                    "pistol"
+                );
+
+            }
+
+            if (
+                e.key === "2"
+            ) {
+
+                chooseWeapon(
+                    "smg"
+                );
+
+            }
+
+            if (
+                e.key === "3"
+            ) {
+
+                chooseWeapon(
+                    "rifle"
+                );
+
+            }
+
+            if (
+                e.key === "4"
+            ) {
+
+                chooseWeapon(
+                    "shotgun"
+                );
+
+            }
+
+            if (
+                e.key === "5"
+            ) {
+
+                chooseWeapon(
+                    "sniper"
+                );
+
+            }
+
+        }
+
+
+        /* ----------------------------------------------------
+           RELOAD
+           ---------------------------------------------------- */
+
+        if (
+            e.key.toLowerCase() === "r"
+        ) {
+
+            reload();
+
+        }
+
+    }
+);
+
+
+window.addEventListener(
+    "keyup",
+    function(e) {
+
+        keys[
+            e.key.toLowerCase()
+        ] = false;
+
+    }
+);
+
+
+/* ============================================================
+   MOUSE EVENTS
+   ============================================================ */
+
+canvas.addEventListener(
+    "mousemove",
+    function(e) {
+
+        mouse.x =
+            e.clientX;
+
+        mouse.y =
+            e.clientY;
+
+    }
+);
+
+
+canvas.addEventListener(
+    "mousedown",
+    function(e) {
+
+        if (
+            e.button === 0
+        ) {
+
+            mouseDown = true;
+
+        }
+
+    }
+);
+
+
+window.addEventListener(
+    "mouseup",
+    function(e) {
+
+        if (
+            e.button === 0
+        ) {
+
+            mouseDown = false;
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   MOBILE TOUCH CONTROLS
+   ============================================================ */
+
+const mobileMove = { x: 0, y: 0 };
+const moveStick = document.getElementById("moveStick");
+const moveStickKnob = document.getElementById("moveStickKnob");
+const mobileReload = document.getElementById("mobileReload");
+let movePointerId = null;
+let aimPointerId = null;
+
+function updateMoveStick(event) {
+    const bounds = moveStick.getBoundingClientRect();
+    const centerX = bounds.left + bounds.width / 2;
+    const centerY = bounds.top + bounds.height / 2;
+    const maxDistance = bounds.width * 0.29;
+    let offsetX = event.clientX - centerX;
+    let offsetY = event.clientY - centerY;
+    const distance = Math.hypot(offsetX, offsetY);
+
+    if (distance > maxDistance) {
+        offsetX = offsetX / distance * maxDistance;
+        offsetY = offsetY / distance * maxDistance;
+    }
+
+    mobileMove.x = offsetX / maxDistance;
+    mobileMove.y = offsetY / maxDistance;
+    moveStickKnob.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+}
+
+function resetMoveStick() {
+    mobileMove.x = 0;
+    mobileMove.y = 0;
+    moveStickKnob.style.transform = "translate(0, 0)";
+}
+
+moveStick.addEventListener("pointerdown", function(event) {
+    if (event.pointerType === "mouse") return;
+    event.preventDefault();
+    movePointerId = event.pointerId;
+    moveStick.setPointerCapture(event.pointerId);
+    updateMoveStick(event);
+});
+
+moveStick.addEventListener("pointermove", function(event) {
+    if (event.pointerId === movePointerId) updateMoveStick(event);
+});
+
+["pointerup", "pointercancel"].forEach(function(eventName) {
+    moveStick.addEventListener(eventName, function(event) {
+        if (event.pointerId === movePointerId) {
+            movePointerId = null;
+            resetMoveStick();
+        }
+    });
+});
+
+canvas.addEventListener("pointerdown", function(event) {
+    if (event.pointerType === "mouse" || event.clientX < canvas.width * 0.35) return;
+    event.preventDefault();
+    aimPointerId = event.pointerId;
+    canvas.setPointerCapture(event.pointerId);
+    mouse.x = event.clientX;
+    mouse.y = event.clientY;
+    mouseDown = true;
+});
+
+canvas.addEventListener("pointermove", function(event) {
+    if (event.pointerId === aimPointerId) {
+        event.preventDefault();
+        mouse.x = event.clientX;
+        mouse.y = event.clientY;
+    }
+});
+
+["pointerup", "pointercancel"].forEach(function(eventName) {
+    canvas.addEventListener(eventName, function(event) {
+        if (event.pointerId === aimPointerId) {
+            aimPointerId = null;
+            mouseDown = false;
+        }
+    });
+});
+
+mobileReload.addEventListener("pointerdown", function(event) {
+    event.preventDefault();
+    reload();
+});
+
+
+/* ============================================================
+   WEAPON CARD CLICK
+   ============================================================ */
+
+document
+    .querySelectorAll(
+        ".weaponCard"
+    )
+    .forEach(
+        function(card) {
+
+            card.addEventListener(
+                "click",
+                function() {
+
+                    chooseWeapon(
+                        card.dataset.weapon
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+/* ============================================================
+   MATH
+   ============================================================ */
+
+function distance(
+    x1,
+    y1,
+    x2,
+    y2
+) {
+
+    return Math.hypot(
+        x2 - x1,
+        y2 - y1
+    );
+
+}
+
+
+function clamp(
+    value,
+    min,
+    max
+) {
+
+    return Math.max(
+        min,
+        Math.min(
+            max,
+            value
+        )
+    );
+
+}
+
+
+/* ============================================================
+   CIRCLE / RECTANGLE COLLISION
+   ============================================================ */
+
+function circleIntersectsRect(
+    cx,
+    cy,
+    radius,
+    rect
+) {
+
+    const closestX =
+        clamp(
+            cx,
+            rect.x,
+            rect.x + rect.w
+        );
+
+    const closestY =
+        clamp(
+            cy,
+            rect.y,
+            rect.y + rect.h
+        );
+
+    const dx =
+        cx - closestX;
+
+    const dy =
+        cy - closestY;
+
+
+    return (
+        dx * dx +
+        dy * dy
+    ) <=
+    radius * radius;
+
+}
+
+
+/* ============================================================
+   WALL COLLISION
+   ============================================================ */
+
+function collidesWithWall(
+    x,
+    y,
+    radius
+) {
+
+    for (
+        const wall of walls
+    ) {
+
+        if (
+            circleIntersectsRect(
+                x,
+                y,
+                radius,
+                wall
+            )
+        ) {
+
+            return true;
+
+        }
+
+    }
+
+    return false;
+
+}
+
+
+/* ============================================================
+   MOVE CIRCLE
+   ============================================================ */
+
+function moveCircle(
+    object,
+    dx,
+    dy
+) {
+
+    const newX =
+        object.x +
+        dx;
+
+
+    if (
+        !collidesWithWall(
+            newX,
+            object.y,
+            object.radius
+        )
+    ) {
+
+        object.x =
+            newX;
+
+    }
+
+
+    const newY =
+        object.y +
+        dy;
+
+
+    if (
+        !collidesWithWall(
+            object.x,
+            newY,
+            object.radius
+        )
+    ) {
+
+        object.y =
+            newY;
+
+    }
+
+
+    object.x =
+        clamp(
+            object.x,
+            object.radius,
+            world.width -
+            object.radius
+        );
+
+
+    object.y =
+        clamp(
+            object.y,
+            object.radius,
+            world.height -
+            object.radius
+        );
+
+}
+
+
+/* ============================================================
+   LINE HITS WALL
+   ============================================================ */
+
+function lineHitsWall(
+    x1,
+    y1,
+    x2,
+    y2,
+    padding = 0
+) {
+
+    const d =
+        distance(
+            x1,
+            y1,
+            x2,
+            y2
+        );
+
+
+    const steps =
+        Math.max(
+            1,
+            Math.ceil(
+                d / 4
+            )
+        );
+
+
+    for (
+        let i = 0;
+        i <= steps;
+        i++
+    ) {
+
+        const t =
+            i / steps;
+
+
+        const x =
+            x1 +
+            (
+                x2 -
+                x1
+            ) *
+            t;
+
+
+        const y =
+            y1 +
+            (
+                y2 -
+                y1
+            ) *
+            t;
+
+
+        for (
+            const wall of walls
+        ) {
+
+            if (
+                circleIntersectsRect(
+                    x,
+                    y,
+                    padding,
+                    wall
+                )
+            ) {
+
+                return true;
+
+            }
+
+        }
+
+    }
+
+
+    return false;
+
+}
+
+
+/* ============================================================
+   LINE OF SIGHT
+   ============================================================ */
+
+function hasLineOfSight(
+    from,
+    to
+) {
+
+    return !lineHitsWall(
+        from.x,
+        from.y,
+        to.x,
+        to.y,
+        2
+    );
+
+}
+
+
+/* ============================================================
+   RANDOM ENEMY WEAPON
+   ============================================================ */
+
+function chooseEnemyWeapon() {
+
+    const weaponKeys =
+        Object.keys(
+            weapons
+        );
+
+
+    let choices =
+        weaponKeys.filter(
+            function(key) {
+
+                return (
+                    key !==
+                    player.weaponKey
+                );
+
+            }
+        );
+
+
+    if (
+        choices.length === 0
+    ) {
+
+        choices =
+            weaponKeys;
+
+    }
+
+
+    const randomIndex =
+        Math.floor(
+            Math.random() *
+            choices.length
+        );
+
+
+    enemy.weaponKey =
+        choices[
+            randomIndex
+        ];
+
+
+    enemy.weapon =
+        weapons[
+            enemy.weaponKey
+        ];
+
+    enemy.maxAmmo =
+        enemy.weapon.maxAmmo;
+
+    enemy.ammo =
+        enemy.maxAmmo;
+
+    enemy.reloadDuration =
+        enemy.weapon.reloadDuration;
+
+    enemy.reloadTimer =
+        0;
+
+
+    enemyWeaponText.textContent =
+        enemy.weapon.name;
+
+}
+
+
+/* ============================================================
+   CHOOSE PLAYER WEAPON
+   ============================================================ */
+
+function chooseWeapon(
+    weaponKey
+) {
+
+    if (
+        !selectingWeapon
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !weapons[
+            weaponKey
+        ]
+    ) {
+
+        return;
+
+    }
+
+
+    player.weaponKey =
+        weaponKey;
+
+
+    player.weapon =
+        weapons[
+            weaponKey
+        ];
+
+
+    player.ammo =
+        player.weapon.maxAmmo;
+
+
+    player.maxAmmo =
+        player.weapon.maxAmmo;
+
+
+    player.reloadDuration =
+        player.weapon.reloadDuration * statClasses[selectedStatClass].reloadMultiplier;
+
+
+    player.fireCooldown =
+        0;
+
+    player.reloadTimer =
+        0;
+
+
+    playerHasSelectedWeapon =
+        true;
+
+
+    selectedWeaponText.textContent =
+        "Selected: " +
+        player.weapon.name;
+
+
+    /* --------------------------------------------------------
+       BOT CHOOSES A DIFFERENT GUN
+       -------------------------------------------------------- */
+
+    if (!onlineMode) {
+        chooseEnemyWeapon();
+    }
+
+
+    /* --------------------------------------------------------
+       START GAME
+       -------------------------------------------------------- */
+
+    setTimeout(
+        function() {
+            // The weapon has already been selected, so selectingWeapon
+            // is false by design. Always start this newly selected round.
+            startRound();
+        },
+        250
+    );
+
+}
+
+
+/* ============================================================
+   START ROUND
+   ============================================================ */
+
+function startRound() {
+
+    selectingWeapon =
+        false;
+
+
+    weaponSelect.style.display =
+        "none";
+
+
+    player.x = onlineMode && onlineRole === 2 ? 1750 : 700;
+
+    player.y = onlineMode && onlineRole === 2 ? 1050 : 500;
+
+
+    enemy.x = onlineMode && onlineRole === 2 ? 700 : 1750;
+
+    enemy.y = onlineMode && onlineRole === 2 ? 500 : 1050;
+
+
+    player.health =
+        player.maxHealth;
+
+
+    enemy.health =
+        enemy.maxHealth;
+
+
+    playerBullets =
+        [];
+
+    enemyBullets =
+        [];
+
+    particles =
+        [];
+
+
+    enemy.alive =
+        true;
+
+
+    player.ammo =
+        player.weapon.maxAmmo;
+
+
+    player.reloadTimer =
+        0;
+
+
+    hideReloadUI();
+
+
+    gameOver =
+        false;
+
+
+    camera.x =
+        player.x -
+        canvas.width / 2;
+
+
+    camera.y =
+        player.y -
+        canvas.height / 2;
+
+
+    updateHUD();
+
+}
+
+
+/* ============================================================
+   START WEAPON SELECTION
+   ============================================================ */
+
+function startWeaponSelection() {
+
+    selectingWeapon =
+        true;
+
+
+    weaponSelectionTimer =
+        weaponSelectionTime;
+
+
+    playerHasSelectedWeapon =
+        false;
+
+
+    selectedWeaponText.textContent =
+        "No weapon selected";
+
+
+    weaponTimer.textContent =
+        weaponSelectionTimer.toFixed(1);
+
+
+    weaponSelect.style.display =
+        "flex";
+
+
+    /* --------------------------------------------------------
+       CLEAR OLD SELECTION
+       -------------------------------------------------------- */
+
+    player.weaponKey =
+        "pistol";
+
+    player.weapon =
+        weapons.pistol;
+
+}
+
+
+/* ============================================================
+   WEAPON SELECTION UPDATE
+   ============================================================ */
+
+function updateWeaponSelection(
+    dt
+) {
+
+    if (
+        !selectingWeapon
+    ) {
+
+        return;
+
+    }
+
+
+    weaponSelectionTimer -=
+        dt;
+
+
+    weaponTimer.textContent =
+        Math.max(
+            0,
+            weaponSelectionTimer
+        ).toFixed(1);
+
+
+    /* --------------------------------------------------------
+       TIME RAN OUT
+       -------------------------------------------------------- */
+
+    if (
+        weaponSelectionTimer <= 0
+    ) {
+
+        if (
+            !playerHasSelectedWeapon
+        ) {
+
+            const weaponKeys =
+                Object.keys(
+                    weapons
+                );
+
+            const randomWeapon =
+                weaponKeys[
+                    Math.floor(
+                        Math.random() *
+                        weaponKeys.length
+                    )
+                ];
+
+            chooseWeapon(
+                randomWeapon
+            );
+
+        }
+
+    }
+
+}
+
+
+/* ============================================================
+   RELOAD UI
+   ============================================================ */
+
+function showReloadUI() {
+
+    reloadUI.style.display =
+        "block";
+
+
+    reloadProgress.style.strokeDashoffset =
+        reloadCircumference;
+
+
+    reloadNumber.textContent =
+        player.reloadDuration.toFixed(1);
+
+}
+
+
+function updateReloadUI() {
+
+    if (
+        player.reloadTimer <= 0
+    ) {
+
+        return;
+
+    }
+
+
+    const remaining =
+        Math.max(
+            0,
+            player.reloadTimer
+        );
+
+
+    const progress =
+        1 -
+        (
+            remaining /
+            player.reloadDuration
+        );
+
+
+    reloadProgress.style.strokeDashoffset =
+        reloadCircumference *
+        (
+            1 -
+            progress
+        );
+
+
+    reloadNumber.textContent =
+        remaining.toFixed(1);
+
+}
+
+
+function hideReloadUI() {
+
+    reloadUI.style.display =
+        "none";
+
+
+    reloadProgress.style.strokeDashoffset =
+        reloadCircumference;
+
+}
+
+
+/* ============================================================
+   RELOAD
+   ============================================================ */
+
+function reload() {
+
+    if (
+        gameOver ||
+        selectingWeapon
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        player.ammo >=
+        player.weapon.maxAmmo
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        player.reloadTimer > 0
+    ) {
+
+        return;
+
+    }
+
+
+    player.reloadTimer =
+        player.weapon.reloadDuration;
+
+
+    showReloadUI();
+
+}
+
+
+/* ============================================================
+   PARTICLE
+   ============================================================ */
+
+function createParticle(
+    x,
+    y,
+    vx,
+    vy,
+    life,
+    size,
+    type = "normal"
+) {
+
+    particles.push({
+
+        x: x,
+
+        y: y,
+
+        vx: vx,
+
+        vy: vy,
+
+        life: life,
+
+        maxLife: life,
+
+        size: size,
+
+        type: type
+
+    });
+
+}
+
+
+/* ============================================================
+   MUZZLE FLASH
+   ============================================================ */
+
+function muzzleFlash(
+    x,
+    y,
+    angle,
+    color = "#ffffff"
+) {
+
+    for (
+        let i = 0;
+        i < 9;
+        i++
+    ) {
+
+        const a =
+            angle +
+            (
+                Math.random() -
+                0.5
+            ) *
+            0.8;
+
+
+        const speed =
+            70 +
+            Math.random() *
+            220;
+
+
+        createParticle(
+            x,
+            y,
+            Math.cos(a) *
+            speed,
+            Math.sin(a) *
+            speed,
+            0.12 +
+            Math.random() *
+            0.16,
+            3 +
+            Math.random() *
+            4,
+            color
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   HIT EFFECT
+   ============================================================ */
+
+function hitEffect(
+    x,
+    y
+) {
+
+    for (
+        let i = 0;
+        i < 14;
+        i++
+    ) {
+
+        const a =
+            Math.random() *
+            Math.PI *
+            2;
+
+
+        const speed =
+            40 +
+            Math.random() *
+            180;
+
+
+        createParticle(
+            x,
+            y,
+            Math.cos(a) *
+            speed,
+            Math.sin(a) *
+            speed,
+            0.25 +
+            Math.random() *
+            0.3,
+            2 +
+            Math.random() *
+            4
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   EXPLOSION
+   ============================================================ */
+
+function explosion(
+    x,
+    y
+) {
+
+    for (
+        let i = 0;
+        i < 40;
+        i++
+    ) {
+
+        const a =
+            Math.random() *
+            Math.PI *
+            2;
+
+
+        const speed =
+            50 +
+            Math.random() *
+            300;
+
+
+        createParticle(
+            x,
+            y,
+            Math.cos(a) *
+            speed,
+            Math.sin(a) *
+            speed,
+            0.4 +
+            Math.random() *
+            0.8,
+            2 +
+            Math.random() *
+            6
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   PLAYER SHOOT
+   ============================================================ */
+
+function shootPlayer() {
+
+    if (
+        gameOver ||
+        selectingWeapon
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        player.reloadTimer > 0
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        player.fireCooldown > 0
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        player.ammo <= 0
+    ) {
+
+        reload();
+
+        return;
+
+    }
+
+
+    player.ammo--;
+
+
+    player.fireCooldown =
+        player.weapon.fireRate;
+
+
+    const muzzleDistance =
+        player.radius +
+        12;
+
+
+    const startX =
+        player.x +
+        Math.cos(
+            player.angle
+        ) *
+        muzzleDistance;
+
+
+    const startY =
+        player.y +
+        Math.sin(
+            player.angle
+        ) *
+        muzzleDistance;
+
+
+    /* --------------------------------------------------------
+       SHOTGUN / MULTI-PELLET SYSTEM
+       -------------------------------------------------------- */
+
+    for (
+        let i = 0;
+        i <
+        player.weapon.pellets;
+        i++
+    ) {
+
+        let bulletAngle =
+            player.angle;
+
+
+        if (
+            player.weapon.pellets >
+            1
+        ) {
+
+            bulletAngle +=
+                (
+                    Math.random() -
+                    0.5
+                ) *
+                player.weapon.spread;
+
+        }
+        else {
+
+            bulletAngle +=
+                (
+                    Math.random() -
+                    0.5
+                ) *
+                player.weapon.spread;
+
+        }
+
+
+        playerBullets.push({
+
+            x: startX,
+
+            y: startY,
+
+            prevX: startX,
+
+            prevY: startY,
+
+            vx:
+                Math.cos(
+                    bulletAngle
+                ) *
+                player.weapon.bulletSpeed,
+
+            vy:
+                Math.sin(
+                    bulletAngle
+                ) *
+                player.weapon.bulletSpeed,
+
+            life: 1.5,
+
+            radius:
+                player.weapon.bulletRadius,
+
+            damage:
+                player.weapon.damage,
+
+            color:
+                player.weapon.color
+
+        });
+
+    }
+
+
+    muzzleFlash(
+        startX,
+        startY,
+        player.angle,
+        player.weapon.color
+    );
+
+
+    if (
+        player.ammo <= 0
+    ) {
+
+        reload();
+
+    }
+
+}
+
+
+/* ============================================================
+   ENEMY RELOAD
+   ============================================================ */
+
+function reloadEnemy() {
+
+    if (
+        !enemy.alive ||
+        enemy.reloadTimer > 0 ||
+        enemy.ammo >= enemy.maxAmmo
+    ) {
+
+        return;
+
+    }
+
+    enemy.reloadTimer =
+        enemy.reloadDuration;
+
+}
+
+
+/* ============================================================
+   ENEMY SHOOT
+   ============================================================ */
+
+function shootEnemy() {
+
+    if (
+        !enemy.alive
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        enemy.reloadTimer > 0
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        enemy.ammo <= 0
+    ) {
+
+        reloadEnemy();
+
+        return;
+
+    }
+
+
+    if (
+        enemy.fireCooldown > 0
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !hasLineOfSight(
+            enemy,
+            player
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const dx =
+        player.x -
+        enemy.x;
+
+
+    const dy =
+        player.y -
+        enemy.y;
+
+
+    const angle =
+        Math.atan2(
+            dy,
+            dx
+        );
+
+
+    enemy.angle =
+        angle;
+
+
+    const muzzleDistance =
+        enemy.radius +
+        10;
+
+
+    const startX =
+        enemy.x +
+        Math.cos(angle) *
+        muzzleDistance;
+
+
+    const startY =
+        enemy.y +
+        Math.sin(angle) *
+        muzzleDistance;
+
+
+    enemy.ammo--;
+
+
+    /* --------------------------------------------------------
+       ENEMY SHOTGUN ALSO FIRES PELLETS
+       -------------------------------------------------------- */
+
+    for (
+        let i = 0;
+        i <
+        enemy.weapon.pellets;
+        i++
+    ) {
+
+        let bulletAngle =
+            angle;
+
+
+        if (
+            enemy.weapon.pellets >
+            1
+        ) {
+
+            bulletAngle +=
+                (
+                    Math.random() -
+                    0.5
+                ) *
+                enemy.weapon.spread;
+
+        }
+        else {
+
+            bulletAngle +=
+                (
+                    Math.random() -
+                    0.5
+                ) *
+                enemy.weapon.spread;
+
+        }
+
+
+        enemyBullets.push({
+
+            x: startX,
+
+            y: startY,
+
+            prevX: startX,
+
+            prevY: startY,
+
+            vx:
+                Math.cos(
+                    bulletAngle
+                ) *
+                enemy.weapon.bulletSpeed,
+
+            vy:
+                Math.sin(
+                    bulletAngle
+                ) *
+                enemy.weapon.bulletSpeed,
+
+            life: 2.5,
+
+            radius:
+                enemy.weapon.bulletRadius,
+
+            damage:
+                enemy.weapon.damage,
+
+            color:
+                "#ff5252"
+
+        });
+
+    }
+
+
+    enemy.fireCooldown =
+        enemy.weapon.fireRate *
+        enemyFireMultiplier;
+
+
+    if (
+        enemy.ammo <= 0
+    ) {
+
+        reloadEnemy();
+
+    }
+
+
+    muzzleFlash(
+        startX,
+        startY,
+        angle,
+        "#ff5252"
+    );
+
+}
+
+
+/* ============================================================
+   PLAYER UPDATE
+   ============================================================ */
+
+function updatePlayer(
+    dt
+) {
+
+    if (
+        gameOver ||
+        selectingWeapon
+    ) {
+
+        return;
+
+    }
+
+
+    /* --------------------------------------------------------
+       RELOAD
+       -------------------------------------------------------- */
+
+    if (
+        player.reloadTimer > 0
+    ) {
+
+        player.reloadTimer -=
+            dt;
+
+
+        updateReloadUI();
+
+
+        if (
+            player.reloadTimer <= 0
+        ) {
+
+            player.reloadTimer =
+                0;
+
+
+            player.ammo =
+                player.weapon.maxAmmo;
+
+
+            hideReloadUI();
+
+        }
+
+    }
+
+
+    /* --------------------------------------------------------
+       FIRE COOLDOWN
+       -------------------------------------------------------- */
+
+    if (
+        player.fireCooldown > 0
+    ) {
+
+        player.fireCooldown -=
+            dt;
+
+    }
+
+
+    /* --------------------------------------------------------
+       INVULNERABILITY
+       -------------------------------------------------------- */
+
+    if (
+        player.invulnerable > 0
+    ) {
+
+        player.invulnerable -=
+            dt;
+
+    }
+
+
+    /* --------------------------------------------------------
+       MOVEMENT
+       -------------------------------------------------------- */
+
+    let moveX = 0;
+
+    let moveY = 0;
+
+
+    if (
+        keys["w"]
+    ) {
+
+        moveY -= 1;
+
+    }
+
+
+    if (
+        keys["s"]
+    ) {
+
+        moveY += 1;
+
+    }
+
+
+    if (
+        keys["a"]
+    ) {
+
+        moveX -= 1;
+
+    }
+
+
+    if (
+        keys["d"]
+    ) {
+
+        moveX += 1;
+
+    }
+
+    // The on-screen joystick uses the same movement path as WASD.
+    moveX += mobileMove.x;
+    moveY += mobileMove.y;
+
+
+    const length =
+        Math.hypot(
+            moveX,
+            moveY
+        );
+
+
+    if (
+        length > 0
+    ) {
+
+        moveX /=
+            length;
+
+        moveY /=
+            length;
+
+
+        const speed =
+            keys["shift"]
+                ? player.sprintSpeed
+                : player.speed;
+
+
+        moveCircle(
+            player,
+            moveX *
+            speed *
+            dt,
+
+            moveY *
+            speed *
+            dt
+        );
+
+    }
+
+
+    /* --------------------------------------------------------
+       AIM
+       -------------------------------------------------------- */
+
+    const worldMouse =
+        screenToWorld(
+            mouse.x,
+            mouse.y
+        );
+
+
+    player.angle =
+        Math.atan2(
+            worldMouse.y -
+            player.y,
+
+            worldMouse.x -
+            player.x
+        );
+
+
+    /* --------------------------------------------------------
+       SHOOT
+       -------------------------------------------------------- */
+
+    if (
+        mouseDown
+    ) {
+
+        shootPlayer();
+
+    }
+
+}
+
+
+/* ============================================================
+   ENEMY UPDATE
+   ============================================================ */
+
+function updateEnemy(
+    dt
+) {
+
+    if (onlineMode) {
+        return;
+    }
+
+    if (
+        !enemy.alive ||
+        selectingWeapon
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        enemy.fireCooldown > 0
+    ) {
+
+        enemy.fireCooldown -=
+            dt;
+
+    }
+
+
+    /* --------------------------------------------------------
+       RELOAD TIMER
+       -------------------------------------------------------- */
+
+    if (
+        enemy.reloadTimer > 0
+    ) {
+
+        enemy.reloadTimer -=
+            dt;
+
+        if (
+            enemy.reloadTimer <= 0
+        ) {
+
+            enemy.reloadTimer =
+                0;
+
+            enemy.ammo =
+                enemy.maxAmmo;
+
+        }
+
+    }
+
+
+    /* --------------------------------------------------------
+       STRAFE TIMER
+       -------------------------------------------------------- */
+
+    enemy.strafeTimer -=
+        dt;
+
+
+    if (
+        enemy.strafeTimer <= 0
+    ) {
+
+        enemy.strafeDirection *=
+            -1;
+
+
+        enemy.strafeTimer =
+            0.35 +
+            Math.random() *
+            0.65;
+
+    }
+
+
+    const dx =
+        player.x -
+        enemy.x;
+
+
+    const dy =
+        player.y -
+        enemy.y;
+
+
+    const dist =
+        Math.hypot(
+            dx,
+            dy
+        );
+
+
+    if (
+        dist === 0
+    ) {
+
+        return;
+
+    }
+
+
+    const nx =
+        dx / dist;
+
+
+    const ny =
+        dy / dist;
+
+
+    let moveX = 0;
+
+    let moveY = 0;
+
+
+    /* --------------------------------------------------------
+       CHASE
+       -------------------------------------------------------- */
+
+    if (
+        dist > 430
+    ) {
+
+        moveX +=
+            nx;
+
+        moveY +=
+            ny;
+
+    }
+
+
+    /* --------------------------------------------------------
+       RETREAT
+       -------------------------------------------------------- */
+
+    else if (
+        dist < 300
+    ) {
+
+        moveX -=
+            nx;
+
+        moveY -=
+            ny;
+
+    }
+
+
+    /* --------------------------------------------------------
+       STRAFE
+       -------------------------------------------------------- */
+
+    moveX +=
+        -ny *
+        enemy.strafeDirection *
+        1.15;
+
+
+    moveY +=
+        nx *
+        enemy.strafeDirection *
+        0.85;
+
+
+    const movementLength =
+        Math.hypot(
+            moveX,
+            moveY
+        );
+
+
+    if (
+        movementLength > 0
+    ) {
+
+        moveX /=
+            movementLength;
+
+        moveY /=
+            movementLength;
+
+    }
+
+
+    const step =
+        enemy.speed *
+        dt;
+
+
+    const testX =
+        enemy.x +
+        moveX *
+        step;
+
+
+    const testY =
+        enemy.y +
+        moveY *
+        step;
+
+
+    /* --------------------------------------------------------
+       NORMAL MOVEMENT
+       -------------------------------------------------------- */
+
+    if (
+        !collidesWithWall(
+            testX,
+            testY,
+            enemy.radius
+        )
+    ) {
+
+        enemy.x =
+            testX;
+
+        enemy.y =
+            testY;
+
+    }
+
+
+    /* --------------------------------------------------------
+       WALL AVOIDANCE
+       -------------------------------------------------------- */
+
+    else {
+
+        const directions = [
+
+            [1, 0],
+
+            [-1, 0],
+
+            [0, 1],
+
+            [0, -1],
+
+            [0.707, 0.707],
+
+            [0.707, -0.707],
+
+            [-0.707, 0.707],
+
+            [-0.707, -0.707],
+
+            [nx, ny],
+
+            [-nx, -ny],
+
+            [-ny, nx],
+
+            [ny, -nx],
+
+            [
+                -ny *
+                enemy.strafeDirection,
+
+                nx *
+                enemy.strafeDirection
+            ]
+
+        ];
+
+
+        let bestDirection =
+            null;
+
+        let bestScore =
+            Infinity;
+
+
+        for (
+            const dir of directions
+        ) {
+
+            const len =
+                Math.hypot(
+                    dir[0],
+                    dir[1]
+                );
+
+
+            if (
+                len === 0
+            ) {
+
+                continue;
+
+            }
+
+
+            const tx =
+                enemy.x +
+                (
+                    dir[0] /
+                    len
+                ) *
+                step;
+
+
+            const ty =
+                enemy.y +
+                (
+                    dir[1] /
+                    len
+                ) *
+                step;
+
+
+            if (
+                collidesWithWall(
+                    tx,
+                    ty,
+                    enemy.radius
+                )
+            ) {
+
+                continue;
+
+            }
+
+
+            const newDistance =
+                distance(
+                    tx,
+                    ty,
+                    player.x,
+                    player.y
+                );
+
+
+            const strafePreference =
+                (
+                    dir[0] *
+                    (-ny)
+                ) +
+                (
+                    dir[1] *
+                    nx
+                );
+
+
+            const scoreValue =
+                newDistance -
+                strafePreference *
+                enemy.strafeDirection *
+                120;
+
+
+            if (
+                scoreValue <
+                bestScore
+            ) {
+
+                bestScore =
+                    scoreValue;
+
+                bestDirection = [
+
+                    dir[0] / len,
+
+                    dir[1] / len
+
+                ];
+
+            }
+
+        }
+
+
+        if (
+            bestDirection
+        ) {
+
+            enemy.x +=
+                bestDirection[0] *
+                step;
+
+
+            enemy.y +=
+                bestDirection[1] *
+                step;
+
+        }
+
+    }
+
+
+    /* --------------------------------------------------------
+       AIM
+       -------------------------------------------------------- */
+
+    enemy.angle =
+        Math.atan2(
+            player.y -
+            enemy.y,
+
+            player.x -
+            enemy.x
+        );
+
+
+    /* --------------------------------------------------------
+       SHOOT ONLY WITH LINE OF SIGHT
+       -------------------------------------------------------- */
+
+    if (
+        hasLineOfSight(
+            enemy,
+            player
+        )
+    ) {
+
+        shootEnemy();
+
+    }
+
+}
+
+
+/* ============================================================
+   PLAYER BULLETS
+   ============================================================ */
+
+function updatePlayerBullets(
+    dt
+) {
+
+    for (
+        let i =
+            playerBullets.length - 1;
+
+        i >= 0;
+
+        i--
+    ) {
+
+        const bullet =
+            playerBullets[i];
+
+
+        bullet.prevX =
+            bullet.x;
+
+        bullet.prevY =
+            bullet.y;
+
+
+        const nextX =
+            bullet.x +
+            bullet.vx *
+            dt;
+
+
+        const nextY =
+            bullet.y +
+            bullet.vy *
+            dt;
+
+
+        /* ----------------------------------------------------
+           WALL
+           ---------------------------------------------------- */
+
+        if (
+            lineHitsWall(
+                bullet.x,
+                bullet.y,
+                nextX,
+                nextY,
+                bullet.radius
+            )
+        ) {
+
+            hitEffect(
+                bullet.x,
+                bullet.y
+            );
+
+
+            playerBullets.splice(
+                i,
+                1
+            );
+
+
+            continue;
+
+        }
+
+
+        bullet.x =
+            nextX;
+
+        bullet.y =
+            nextY;
+
+
+        bullet.life -=
+            dt;
+
+
+        /* ----------------------------------------------------
+           ENEMY HIT
+           ---------------------------------------------------- */
+
+        if (
+            enemy.alive &&
+            distance(
+                bullet.x,
+                bullet.y,
+                enemy.x,
+                enemy.y
+            ) <
+            bullet.radius +
+            enemy.radius
+        ) {
+
+            hitEffect(
+                bullet.x,
+                bullet.y
+            );
+
+
+            playerBullets.splice(
+                i,
+                1
+            );
+
+            if (onlineMode) {
+                sendOnline({ type: "hit", damage: bullet.damage });
+                continue;
+            }
+
+            enemy.health -=
+                bullet.damage;
+
+            if (
+                enemy.health <= 0
+            ) {
+
+                enemy.health =
+                    0;
+
+                enemy.alive =
+                    false;
+
+                score +=
+                    100;
+
+                explosion(
+                    enemy.x,
+                    enemy.y
+                );
+
+
+                setTimeout(
+                    function() {
+
+                        if (
+                            !gameOver
+                        ) {
+
+                            endGame();
+
+                        }
+
+                    },
+                    500
+                );
+
+            }
+
+
+            continue;
+
+        }
+
+
+        /* ----------------------------------------------------
+           OUT OF WORLD
+           ---------------------------------------------------- */
+
+        if (
+            bullet.x < 0 ||
+            bullet.y < 0 ||
+            bullet.x >
+                world.width ||
+            bullet.y >
+                world.height ||
+            bullet.life <= 0
+        ) {
+
+            playerBullets.splice(
+                i,
+                1
+            );
+
+        }
+
+    }
+
+}
+
+
+/* ============================================================
+   ENEMY BULLETS
+   ============================================================ */
+
+function updateEnemyBullets(
+    dt
+) {
+
+    if (onlineMode) {
+        return;
+    }
+
+    for (
+        let i =
+            enemyBullets.length - 1;
+
+        i >= 0;
+
+        i--
+    ) {
+
+        const bullet =
+            enemyBullets[i];
+
+
+        bullet.prevX =
+            bullet.x;
+
+        bullet.prevY =
+            bullet.y;
+
+
+        const nextX =
+            bullet.x +
+            bullet.vx *
+            dt;
+
+
+        const nextY =
+            bullet.y +
+            bullet.vy *
+            dt;
+
+
+        /* ----------------------------------------------------
+           WALL
+           ---------------------------------------------------- */
+
+        if (
+            lineHitsWall(
+                bullet.x,
+                bullet.y,
+                nextX,
+                nextY,
+                bullet.radius
+            )
+        ) {
+
+            hitEffect(
+                bullet.x,
+                bullet.y
+            );
+
+
+            enemyBullets.splice(
+                i,
+                1
+            );
+
+
+            continue;
+
+        }
+
+
+        bullet.x =
+            nextX;
+
+        bullet.y =
+            nextY;
+
+
+        bullet.life -=
+            dt;
+
+
+        /* ----------------------------------------------------
+           PLAYER HIT
+           ---------------------------------------------------- */
+
+        if (
+            distance(
+                bullet.x,
+                bullet.y,
+                player.x,
+                player.y
+            ) <
+            bullet.radius +
+            player.radius
+        ) {
+
+            if (
+                player.invulnerable <= 0
+            ) {
+
+                player.health -=
+                    bullet.damage;
+
+
+                player.invulnerable =
+                    0.15;
+
+
+                hitEffect(
+                    player.x,
+                    player.y
+                );
+
+
+                if (
+                    player.health <= 0
+                ) {
+
+                    player.health =
+                        0;
+
+
+                    endGame();
+
+                }
+
+            }
+
+
+            enemyBullets.splice(
+                i,
+                1
+            );
+
+
+            continue;
+
+        }
+
+
+        /* ----------------------------------------------------
+           OUT OF WORLD
+           ---------------------------------------------------- */
+
+        if (
+            bullet.x < 0 ||
+            bullet.y < 0 ||
+            bullet.x >
+                world.width ||
+            bullet.y >
+                world.height ||
+            bullet.life <= 0
+        ) {
+
+            enemyBullets.splice(
+                i,
+                1
+            );
+
+        }
+
+    }
+
+}
+
+
+/* ============================================================
+   PARTICLES UPDATE
+   ============================================================ */
+
+function updateParticles(
+    dt
+) {
+
+    for (
+        let i =
+            particles.length - 1;
+
+        i >= 0;
+
+        i--
+    ) {
+
+        const p =
+            particles[i];
+
+
+        p.x +=
+            p.vx *
+            dt;
+
+
+        p.y +=
+            p.vy *
+            dt;
+
+
+        p.vx *=
+            0.96;
+
+
+        p.vy *=
+            0.96;
+
+
+        p.life -=
+            dt;
+
+
+        if (
+            p.life <= 0
+        ) {
+
+            particles.splice(
+                i,
+                1
+            );
+
+        }
+
+    }
+
+}
+
+
+/* ============================================================
+   CAMERA
+   ============================================================ */
+
+function updateCamera() {
+
+    let targetX =
+        player.x;
+
+
+    let targetY =
+        player.y;
+
+
+    if (
+        enemy.alive
+    ) {
+
+        const dx =
+            player.x -
+            enemy.x;
+
+
+        const dy =
+            player.y -
+            enemy.y;
+
+
+        const dist =
+            Math.hypot(
+                dx,
+                dy
+            );
+
+
+        const amount =
+            Math.min(
+                dist *
+                0.3,
+
+                180
+            );
+
+
+        targetX =
+            enemy.x +
+            (
+                dx /
+                Math.max(
+                    dist,
+                    1
+                )
+            ) *
+            amount;
+
+
+        targetY =
+            enemy.y +
+            (
+                dy /
+                Math.max(
+                    dist,
+                    1
+                )
+            ) *
+            amount;
+
+    }
+
+
+    const desiredX =
+        clamp(
+            targetX -
+            canvas.width / 2,
+
+            0,
+
+            Math.max(
+                0,
+                world.width -
+                canvas.width
+            )
+        );
+
+
+    const desiredY =
+        clamp(
+            targetY -
+            canvas.height / 2,
+
+            0,
+
+            Math.max(
+                0,
+                world.height -
+                canvas.height
+            )
+        );
+
+
+    camera.x +=
+        (
+            desiredX -
+            camera.x
+        ) *
+        camera.smoothing;
+
+
+    camera.y +=
+        (
+            desiredY -
+            camera.y
+        ) *
+        camera.smoothing;
+
+}
+
+
+/* ============================================================
+   WORLD TO SCREEN
+   ============================================================ */
+
+function worldToScreen(
+    x,
+    y
+) {
+
+    return {
+
+        x:
+            x -
+            camera.x,
+
+        y:
+            y -
+            camera.y
+
+    };
+
+}
+
+
+/* ============================================================
+   SCREEN TO WORLD
+   ============================================================ */
+
+function screenToWorld(
+    x,
+    y
+) {
+
+    return {
+
+        x:
+            x +
+            camera.x,
+
+        y:
+            y +
+            camera.y
+
+    };
+
+}
+
+
+/* ============================================================
+   DRAW WORLD
+   ============================================================ */
+
+function drawWorld() {
+
+    ctx.fillStyle =
+        "#111";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /* --------------------------------------------------------
+       GRID
+       -------------------------------------------------------- */
+
+    const gridSize =
+        80;
+
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,0.045)";
+
+    ctx.lineWidth =
+        1;
+
+
+    const startX =
+        Math.floor(
+            camera.x /
+            gridSize
+        ) *
+        gridSize;
+
+
+    const startY =
+        Math.floor(
+            camera.y /
+            gridSize
+        ) *
+        gridSize;
+
+
+    for (
+        let x =
+            startX;
+
+        x <
+            camera.x +
+            canvas.width +
+            gridSize;
+
+        x +=
+            gridSize
+    ) {
+
+        const sx =
+            x -
+            camera.x;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            sx,
+            0
+        );
+
+        ctx.lineTo(
+            sx,
+            canvas.height
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    for (
+        let y =
+            startY;
+
+        y <
+            camera.y +
+            canvas.height +
+            gridSize;
+
+        y +=
+            gridSize
+    ) {
+
+        const sy =
+            y -
+            camera.y;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            sy
+        );
+
+        ctx.lineTo(
+            canvas.width,
+            sy
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    /* --------------------------------------------------------
+       WORLD BORDER
+       -------------------------------------------------------- */
+
+    const border =
+        worldToScreen(
+            0,
+            0
+        );
+
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,0.3)";
+
+    ctx.lineWidth =
+        4;
+
+
+    ctx.strokeRect(
+        border.x,
+        border.y,
+        world.width,
+        world.height
+    );
+
+
+    /* --------------------------------------------------------
+       WALLS
+       -------------------------------------------------------- */
+
+    for (
+        const wall of walls
+    ) {
+
+        const pos =
+            worldToScreen(
+                wall.x,
+                wall.y
+            );
+
+
+        ctx.fillStyle =
+            "#292929";
+
+
+        ctx.fillRect(
+            pos.x,
+            pos.y,
+            wall.w,
+            wall.h
+        );
+
+
+        ctx.strokeStyle =
+            "#777";
+
+
+        ctx.lineWidth =
+            2;
+
+
+        ctx.strokeRect(
+            pos.x,
+            pos.y,
+            wall.w,
+            wall.h
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   DRAW PLAYER
+   ============================================================ */
+
+function drawWeaponModel(weaponKey, scale = 1, skinKey = null) {
+
+    ctx.save();
+    ctx.scale(scale, scale);
+
+    const weapon = weapons[weaponKey] || weapons.pistol;
+    const finish = skinKey ? weaponSkins[skinKey] || weaponSkins.obsidian : null;
+
+    /* Weapon shadow */
+    ctx.fillStyle = "rgba(0,0,0,0.35)";
+    ctx.beginPath();
+    ctx.ellipse(31, 7, 28, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    /* Weapon body */
+    let bodyWidth = 31;
+    let bodyHeight = 9;
+    let barrelLength = 18;
+    let barrelWidth = 5;
+    let gripX = 5;
+    let gripHeight = 16;
+
+    if (weaponKey === "smg") {
+        bodyWidth = 34;
+        bodyHeight = 10;
+        barrelLength = 17;
+        barrelWidth = 5;
+        gripX = 6;
+        gripHeight = 18;
+    }
+
+    if (weaponKey === "rifle") {
+        bodyWidth = 43;
+        bodyHeight = 10;
+        barrelLength = 28;
+        barrelWidth = 4;
+        gripX = 7;
+        gripHeight = 19;
+    }
+
+    if (weaponKey === "shotgun") {
+        bodyWidth = 35;
+        bodyHeight = 11;
+        barrelLength = 27;
+        barrelWidth = 7;
+        gripX = 6;
+        gripHeight = 19;
+    }
+
+    if (weaponKey === "sniper") {
+        bodyWidth = 48;
+        bodyHeight = 8;
+        barrelLength = 35;
+        barrelWidth = 4;
+        gripX = 10;
+        gripHeight = 17;
+    }
+
+    /* Main receiver */
+    ctx.fillStyle = finish ? finish.body : "#252a30";
+    ctx.fillRect(8, -bodyHeight / 2, bodyWidth, bodyHeight);
+
+    /* Receiver highlight */
+    ctx.fillStyle = finish ? finish.highlight : "#4c5661";
+    ctx.fillRect(11, -bodyHeight / 2 + 2, bodyWidth - 8, 2);
+
+    /* Barrel */
+    ctx.fillStyle = finish ? finish.barrel : "#111418";
+    ctx.fillRect(
+        8 + bodyWidth - 2,
+        -barrelWidth / 2,
+        barrelLength,
+        barrelWidth
+    );
+
+    /* Muzzle */
+    ctx.fillStyle = "#090b0d";
+    ctx.fillRect(
+        8 + bodyWidth + barrelLength - 3,
+        -barrelWidth / 2 - 1,
+        5,
+        barrelWidth + 2
+    );
+
+    /* Grip */
+    ctx.save();
+    ctx.translate(gripX + 10, bodyHeight / 2 - 1);
+    ctx.rotate(0.25);
+    ctx.fillStyle = finish ? finish.grip : "#17191c";
+    ctx.beginPath();
+    ctx.roundRect(-5, 0, 10, gripHeight, 3);
+    ctx.fill();
+    ctx.fillStyle = "#353a40";
+    ctx.fillRect(-2, 3, 3, gripHeight - 7);
+    ctx.restore();
+
+    /* Trigger guard */
+    ctx.strokeStyle = "#090b0d";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(18, 4, 7, 0, Math.PI);
+    ctx.stroke();
+
+    /* Weapon-specific details */
+    if (weaponKey === "pistol") {
+        ctx.fillStyle = finish ? finish.accent : "#606872";
+        ctx.fillRect(16, -5, 9, 2);
+        ctx.fillStyle = "#0d0f12";
+        ctx.fillRect(37, -2, 9, 4);
+    }
+
+    if (weaponKey === "smg") {
+        ctx.fillStyle = "#15181c";
+        ctx.fillRect(21, 5, 13, 7);
+        ctx.fillStyle = finish ? finish.accent : "#737b84";
+        ctx.fillRect(25, -7, 8, 2);
+    }
+
+    if (weaponKey === "rifle") {
+        ctx.fillStyle = "#121519";
+        ctx.fillRect(27, 4, 22, 6);
+        ctx.fillStyle = finish ? finish.accent : "#66707a";
+        ctx.fillRect(17, -8, 13, 2);
+        ctx.fillStyle = "#0c0e11";
+        ctx.fillRect(42, -2, 12, 3);
+    }
+
+    if (weaponKey === "shotgun") {
+        ctx.fillStyle = finish ? finish.body : "#6d4930";
+        ctx.fillRect(10, 5, 25, 7);
+        ctx.fillStyle = "#111316";
+        ctx.fillRect(40, -4, 25, 8);
+        ctx.fillStyle = finish ? finish.accent : "#454b52";
+        ctx.fillRect(20, -7, 9, 3);
+    }
+
+    if (weaponKey === "sniper") {
+        /* Scope */
+        ctx.fillStyle = "#111418";
+        ctx.fillRect(22, -13, 20, 5);
+        ctx.fillStyle = finish ? finish.accent : "#68727c";
+        ctx.fillRect(25, -12, 13, 2);
+        ctx.fillStyle = "#0a0c0e";
+        ctx.fillRect(57, -2, 18, 3);
+    }
+
+    /* Small metallic shine */
+    ctx.fillStyle = "rgba(255,255,255,0.18)";
+    ctx.fillRect(12, -bodyHeight / 2 + 1, Math.max(10, bodyWidth * 0.35), 1);
+
+    ctx.restore();
+}
+
+
+/* ============================================================
+   DRAW PLAYER
+   ============================================================ */
+
+function drawPlayer() {
+
+    const pos = worldToScreen(
+        player.x,
+        player.y
+    );
+
+    ctx.save();
+    ctx.translate(pos.x, pos.y);
+
+    // Flip the character left/right to match the side the hands are aiming.
+    const playerFacing = Math.cos(player.angle) >= 0 ? 1 : -1;
+
+    ctx.save();
+    ctx.scale(playerFacing, 1);
+
+    const flash = player.invulnerable > 0;
+
+    /* Character shadow */
+    ctx.fillStyle = "rgba(0,0,0,0.38)";
+    ctx.beginPath();
+    ctx.ellipse(0, 9, 32, 18, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    /* Legs stay still */
+    ctx.fillStyle = flash ? "#ffffff" : playerAppearance.helmet;
+    ctx.beginPath();
+    ctx.roundRect(-16, 5, 11, 25, 5);
+    ctx.roundRect(5, 5, 11, 25, 5);
+    ctx.fill();
+
+    /* Boots */
+    ctx.fillStyle = "#101317";
+    ctx.beginPath();
+    ctx.roundRect(-18, 25, 14, 7, 3);
+    ctx.roundRect(4, 25, 14, 7, 3);
+    ctx.fill();
+
+    /* Torso stays facing forward */
+    ctx.fillStyle = flash ? "#ffffff" : playerAppearance.armor;
+    ctx.beginPath();
+    ctx.roundRect(-20, -16, 40, 30, 9);
+    ctx.fill();
+
+    /* Body armor */
+    ctx.fillStyle = flash ? "#dddddd" : playerAppearance.armor;
+    ctx.beginPath();
+    ctx.roundRect(-14, -11, 28, 21, 6);
+    ctx.fill();
+
+    /* Armor center plate */
+    ctx.strokeStyle = "rgba(255,255,255,0.55)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(-9, -7, 18, 13, 3);
+    ctx.stroke();
+
+    /* Neck */
+    ctx.fillStyle = flash ? "#ffffff" : playerAppearance.skin;
+    ctx.fillRect(-7, -21, 14, 8);
+
+    /* Head stays still */
+    ctx.fillStyle = flash ? "#ffffff" : playerAppearance.skin;
+    ctx.beginPath();
+    ctx.arc(0, -27, 14, 0, Math.PI * 2);
+    ctx.fill();
+
+    /* Helmet / hair */
+    ctx.fillStyle = flash ? "#ffffff" : playerAppearance.helmet;
+    ctx.beginPath();
+    ctx.arc(0, -30, 15, Math.PI, Math.PI * 2);
+    ctx.lineTo(15, -28);
+    ctx.lineTo(-15, -28);
+    ctx.closePath();
+    ctx.fill();
+
+    /* Visor */
+    ctx.fillStyle = "#8ee7ff";
+    ctx.beginPath();
+    ctx.roundRect(4, -33, 9, 5, 2);
+    ctx.fill();
+
+    /* Character outline */
+    ctx.strokeStyle = flash ? "#ffffff" : "#0b1720";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.roundRect(-20, -16, 40, 30, 9);
+    ctx.stroke();
+
+    // The body is flipped, but the arms/hands stay independently aimed.
+    ctx.restore();
+
+    /* ========================================================
+       MOVING ARMS + HANDS
+       Only the arms and weapon follow the aim direction.
+       The torso, head and legs do NOT rotate.
+       ======================================================== */
+    ctx.save();
+    ctx.rotate(player.angle);
+
+    ctx.strokeStyle = flash ? "#ffffff" : playerAppearance.skin;
+    ctx.lineWidth = 8;
+    ctx.lineCap = "round";
+
+    /* Rear arm reaches toward the weapon */
+    ctx.beginPath();
+    ctx.moveTo(-18, -6);
+    ctx.lineTo(-9, 1);
+    ctx.lineTo(7, 2);
+    ctx.stroke();
+
+    /* Front arm reaches farther forward */
+    ctx.beginPath();
+    ctx.moveTo(18, -6);
+    ctx.lineTo(10, 1);
+    ctx.lineTo(18, 1);
+    ctx.stroke();
+
+    /* Hands */
+    ctx.fillStyle = flash ? "#ffffff" : playerAppearance.skin;
+    ctx.beginPath();
+    ctx.arc(8, 2, 4.5, 0, Math.PI * 2);
+    ctx.arc(18, 1, 4.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    /* Gun follows the hands */
+    drawWeaponModel(player.weaponKey, 0.9, playerAppearance.weaponSkin);
+
+    ctx.restore();
+    ctx.restore();
+}
+
+/* ============================================================
+   DRAW ENEMY
+   ============================================================ */
+
+function drawEnemy() {
+
+    if (!enemy.alive) {
+        return;
+    }
+
+    const pos = worldToScreen(
+        enemy.x,
+        enemy.y
+    );
+
+    ctx.save();
+    ctx.translate(pos.x, pos.y);
+
+    // Flip the character left/right to match the side the hands are aiming.
+    const enemyFacing = Math.cos(enemy.angle) >= 0 ? 1 : -1;
+
+    ctx.save();
+    ctx.scale(enemyFacing, 1);
+
+    /* Character shadow */
+    ctx.fillStyle = "rgba(0,0,0,0.42)";
+    ctx.beginPath();
+    ctx.ellipse(0, 10, 38, 21, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    /* Legs stay still */
+    ctx.fillStyle = "#35171b";
+    ctx.beginPath();
+    ctx.roundRect(-19, 5, 13, 29, 5);
+    ctx.roundRect(6, 5, 13, 29, 5);
+    ctx.fill();
+
+    /* Boots */
+    ctx.fillStyle = "#100f12";
+    ctx.beginPath();
+    ctx.roundRect(-21, 28, 16, 8, 3);
+    ctx.roundRect(5, 28, 16, 8, 3);
+    ctx.fill();
+
+    /* Torso stays facing forward */
+    ctx.fillStyle = "#b52c32";
+    ctx.beginPath();
+    ctx.roundRect(-24, -19, 48, 34, 10);
+    ctx.fill();
+
+    /* Armor */
+    ctx.fillStyle = "#d13d45";
+    ctx.beginPath();
+    ctx.roundRect(-17, -13, 34, 24, 6);
+    ctx.fill();
+
+    /* Dark armor plate */
+    ctx.fillStyle = "#5b2027";
+    ctx.beginPath();
+    ctx.roundRect(-11, -9, 22, 16, 4);
+    ctx.fill();
+
+    /* Neck */
+    ctx.fillStyle = "#a9634e";
+    ctx.fillRect(-8, -24, 16, 8);
+
+    /* Head stays still */
+    ctx.fillStyle = "#c17b5d";
+    ctx.beginPath();
+    ctx.arc(0, -31, 16, 0, Math.PI * 2);
+    ctx.fill();
+
+    /* Helmet */
+    ctx.fillStyle = "#28171a";
+    ctx.beginPath();
+    ctx.arc(0, -34, 17, Math.PI, Math.PI * 2);
+    ctx.lineTo(17, -31);
+    ctx.lineTo(-17, -31);
+    ctx.closePath();
+    ctx.fill();
+
+    /* Red visor */
+    ctx.fillStyle = "#ff8b8f";
+    ctx.beginPath();
+    ctx.roundRect(4, -37, 10, 5, 2);
+    ctx.fill();
+
+    /* Enemy outline */
+    ctx.strokeStyle = "#321014";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.roundRect(-24, -19, 48, 34, 10);
+    ctx.stroke();
+
+    // The body is flipped, but the arms/hands stay independently aimed.
+    ctx.restore();
+
+    /* ========================================================
+       MOVING ENEMY ARMS + HANDS
+       The bot aims its hands and weapon independently of its body.
+       ======================================================== */
+    ctx.save();
+    ctx.rotate(enemy.angle);
+
+    ctx.strokeStyle = "#b86f55";
+    ctx.lineWidth = 9;
+    ctx.lineCap = "round";
+
+    /* Rear arm */
+    ctx.beginPath();
+    ctx.moveTo(-22, -6);
+    ctx.lineTo(-10, 2);
+    ctx.lineTo(8, 2);
+    ctx.stroke();
+
+    /* Front arm */
+    ctx.beginPath();
+    ctx.moveTo(22, -6);
+    ctx.lineTo(11, 2);
+    ctx.lineTo(19, 2);
+    ctx.stroke();
+
+    /* Hands */
+    ctx.fillStyle = "#c77b5c";
+    ctx.beginPath();
+    ctx.arc(8, 2, 5, 0, Math.PI * 2);
+    ctx.arc(19, 2, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    /* Gun follows enemy hands */
+    drawWeaponModel(enemy.weaponKey, 1.0);
+
+    ctx.restore();
+    ctx.restore();
+
+    /* Health above enemy */
+    const barWidth = 100;
+    const barHeight = 8;
+    const barX = pos.x - barWidth / 2;
+    const barY = pos.y - enemy.radius - 25;
+
+    ctx.fillStyle = "rgba(0,0,0,0.75)";
+    ctx.fillRect(
+        barX,
+        barY,
+        barWidth,
+        barHeight
+    );
+
+    ctx.fillStyle = "#e53935";
+    ctx.fillRect(
+        barX,
+        barY,
+        barWidth * (enemy.health / enemy.maxHealth),
+        barHeight
+    );
+
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(
+        barX,
+        barY,
+        barWidth,
+        barHeight
+    );
+}
+
+/* ============================================================
+   DRAW BULLETS
+   ============================================================ */
+
+function drawBullets() {
+
+    for (
+        const bullet of
+        playerBullets
+    ) {
+
+        const pos =
+            worldToScreen(
+                bullet.x,
+                bullet.y
+            );
+
+
+        ctx.fillStyle =
+            bullet.color ||
+            "#ffffff";
+
+
+        ctx.beginPath();
+
+
+        ctx.arc(
+            pos.x,
+            pos.y,
+            bullet.radius,
+            0,
+            Math.PI * 2
+        );
+
+
+        ctx.fill();
+
+    }
+
+
+    for (
+        const bullet of
+        enemyBullets
+    ) {
+
+        const pos =
+            worldToScreen(
+                bullet.x,
+                bullet.y
+            );
+
+
+        ctx.fillStyle =
+            bullet.color ||
+            "#ff5252";
+
+
+        ctx.beginPath();
+
+
+        ctx.arc(
+            pos.x,
+            pos.y,
+            bullet.radius,
+            0,
+            Math.PI * 2
+        );
+
+
+        ctx.fill();
+
+    }
+
+}
+
+
+/* ============================================================
+   DRAW PARTICLES
+   ============================================================ */
+
+function drawParticles() {
+
+    for (
+        const p of particles
+    ) {
+
+        const pos =
+            worldToScreen(
+                p.x,
+                p.y
+            );
+
+
+        const alpha =
+            clamp(
+                p.life /
+                p.maxLife,
+                0,
+                1
+            );
+
+
+        ctx.globalAlpha =
+            alpha;
+
+
+        ctx.fillStyle =
+            typeof p.type ===
+            "string" &&
+            p.type.startsWith("#")
+                ? p.type
+                : "#ffffff";
+
+
+        ctx.beginPath();
+
+
+        ctx.arc(
+            pos.x,
+            pos.y,
+            p.size,
+            0,
+            Math.PI * 2
+        );
+
+
+        ctx.fill();
+
+    }
+
+
+    ctx.globalAlpha =
+        1;
+
+}
+
+
+/* ============================================================
+   CROSSHAIR
+   ============================================================ */
+
+function drawCrosshair() {
+
+    const x =
+        mouse.x;
+
+
+    const y =
+        mouse.y;
+
+
+    ctx.save();
+
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,0.9)";
+
+
+    ctx.lineWidth =
+        2;
+
+
+    ctx.beginPath();
+
+
+    ctx.moveTo(
+        x - 13,
+        y
+    );
+
+
+    ctx.lineTo(
+        x - 5,
+        y
+    );
+
+
+    ctx.moveTo(
+        x + 5,
+        y
+    );
+
+
+    ctx.lineTo(
+        x + 13,
+        y
+    );
+
+
+    ctx.moveTo(
+        x,
+        y - 13
+    );
+
+
+    ctx.lineTo(
+        x,
+        y - 5
+    );
+
+
+    ctx.moveTo(
+        x,
+        y + 5
+    );
+
+
+    ctx.lineTo(
+        x,
+        y + 13
+    );
+
+
+    ctx.stroke();
+
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+        x,
+        y,
+        2,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.fillStyle =
+        "white";
+
+
+    ctx.fill();
+
+
+    ctx.restore();
+
+}
+
+
+/* ============================================================
+   CAMERA FRAME
+   ============================================================ */
+
+function drawCameraFrame() {
+
+    const gradient =
+        ctx.createRadialGradient(
+
+            canvas.width / 2,
+            canvas.height / 2,
+
+            Math.min(
+                canvas.width,
+                canvas.height
+            ) *
+            0.3,
+
+            canvas.width / 2,
+            canvas.height / 2,
+
+            Math.max(
+                canvas.width,
+                canvas.height
+            ) *
+            0.75
+
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "rgba(0,0,0,0)"
+    );
+
+
+    gradient.addColorStop(
+        1,
+        "rgba(0,0,0,0.45)"
+    );
+
+
+    ctx.fillStyle =
+        gradient;
+
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    ctx.fillStyle =
+        "rgba(255,255,255,0.45)";
+
+
+    ctx.font =
+        "11px Arial";
+
+
+    ctx.textAlign =
+        "right";
+
+
+    ctx.fillText(
+        "SECOND-PERSON VIEW",
+        canvas.width - 15,
+        canvas.height - 15
+    );
+
+}
+
+
+/* ============================================================
+   HUD UPDATE
+   ============================================================ */
+
+function updateHUD() {
+
+    healthFill.style.width =
+        (
+            player.health /
+            player.maxHealth *
+            100
+        ) +
+        "%";
+
+
+    enemyHealthFill.style.width =
+        (
+            enemy.health /
+            enemy.maxHealth *
+            100
+        ) +
+        "%";
+
+
+    ammoText.textContent =
+        player.ammo +
+        " / " +
+        player.weapon.maxAmmo;
+
+
+    scoreText.textContent =
+        score;
+
+
+    weaponName.textContent =
+        player.weapon.name;
+
+
+    weaponStats.textContent =
+        "Damage: " +
+        player.weapon.damage +
+        " | Fire: " +
+        player.weapon.fireRate.toFixed(2) +
+        "s | Reload: " +
+        player.reloadDuration.toFixed(1) +
+        "s";
+
+
+    enemyWeaponText.textContent =
+        enemy.weapon.name;
+
+}
+
+
+/* ============================================================
+   END GAME
+   ============================================================ */
+
+function endGame() {
+
+    if (
+        gameOver
+    ) {
+
+        return;
+
+    }
+
+
+    gameOver =
+        true;
+
+
+    mouseDown =
+        false;
+
+
+    hideReloadUI();
+
+
+    finalScore.textContent =
+        "Score: " +
+        score;
+
+
+    gameOverScreen.style.display =
+        "flex";
+
+}
+
+
+/* ============================================================
+   RESTART
+   ============================================================ */
+
+function restartGame() {
+
+    /* --------------------------------------------------------
+       FULL NEW-ROUND RESET
+       -------------------------------------------------------- */
+
+    gameOver = false;
+    mouseDown = false;
+
+    // Keep the score between rounds.
+    // Only the player/enemy state is reset.
+
+    applyCharacterStats();
+
+    player.x = 700;
+    player.y = 500;
+    player.health = player.maxHealth;
+    player.fireCooldown = 0;
+    player.reloadTimer = 0;
+    player.invulnerable = 0;
+    playerHasSelectedWeapon = false;
+
+    enemy.x = 1750;
+    enemy.y = 1050;
+    enemy.health = enemy.maxHealth;
+    enemy.fireCooldown = 0;
+    enemy.reloadTimer = 0;
+    enemy.maxAmmo = enemy.weapon.maxAmmo;
+    enemy.ammo = enemy.maxAmmo;
+    enemy.reloadDuration = enemy.weapon.reloadDuration;
+    enemy.strafeDirection = 1;
+    enemy.strafeTimer = 1;
+    enemy.alive = true;
+
+    // Clear every projectile and particle from the previous round.
+    playerBullets.length = 0;
+    enemyBullets.length = 0;
+    particles.length = 0;
+
+    hideReloadUI();
+
+    // Hide the game-over screen before opening weapon selection.
+    gameOverScreen.style.display = "none";
+
+    // Reset the selection state and timer.
+    selectingWeapon = true;
+    weaponSelectionTimer = weaponSelectionTime;
+    selectedWeaponText.textContent = "No weapon selected";
+    weaponTimer.textContent = weaponSelectionTimer.toFixed(1);
+
+    // Reset the displayed weapon until the player chooses again.
+    player.weaponKey = "pistol";
+    player.weapon = weapons.pistol;
+    player.maxAmmo = player.weapon.maxAmmo;
+    player.ammo = player.maxAmmo;
+    player.reloadDuration = player.weapon.reloadDuration * statClasses[selectedStatClass].reloadMultiplier;
+
+    // IMPORTANT: actually show the weapon-selection screen.
+    weaponSelect.style.display = "flex";
+
+    updateHUD();
+}
+
+
+/* ============================================================
+   NEW ROUND BUTTON
+   ============================================================ */
+
+restartButton.addEventListener("click", function() {
+    restartGame();
+});
+
+document.getElementById("chooseAnotherModeButton").addEventListener("click", function() {
+    showMainMenu();
+});
+
+document.getElementById("gameOverBackButton").addEventListener("click", function() {
+    gameOverScreen.style.display = "none";
+    mainMenu.style.display = "none";
+    difficultyMenu.style.display = "flex";
+    weaponSelect.style.display = "none";
+    selectingWeapon = false;
+    gameOver = false;
+});
+
+
+
+/* ============================================================
+   MAIN UPDATE
+   ============================================================ */
+
+function update(
+    dt
+) {
+
+    updateWeaponSelection(
+        dt
+    );
+
+
+    updatePlayer(
+        dt
+    );
+
+
+    updateEnemy(
+        dt
+    );
+
+
+    updatePlayerBullets(
+        dt
+    );
+
+
+    updateEnemyBullets(
+        dt
+    );
+
+
+    updateParticles(
+        dt
+    );
+
+
+    updateCamera();
+
+
+    updateHUD();
+
+    if (onlineMode && onlineReady && !selectingWeapon) {
+        sendOnline({
+            type: "state",
+            x: player.x,
+            y: player.y,
+            angle: player.angle,
+            health: player.health,
+            maxHealth: player.maxHealth,
+            weaponKey: player.weaponKey,
+            alive: player.health > 0
+        });
+    }
+
+}
+
+
+/* ============================================================
+   MAIN DRAW
+   ============================================================ */
+
+function draw() {
+
+    drawWorld();
+
+    drawBullets();
+
+    drawParticles();
+
+    drawPlayer();
+
+    drawEnemy();
+
+    drawCameraFrame();
+
+    drawCrosshair();
+
+}
+
+
+/* ============================================================
+   GAME LOOP
+   ============================================================ */
+
+let lastTime =
+    performance.now();
+
+
+function gameLoop(
+    currentTime
+) {
+
+    let dt =
+        (
+            currentTime -
+            lastTime
+        ) /
+        1000;
+
+
+    lastTime =
+        currentTime;
+
+
+    dt =
+        Math.min(
+            dt,
+            0.05
+        );
+
+
+    update(
+        dt
+    );
+
+
+    draw();
+
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
+}
+
+
+/* ============================================================
+   START
+   ============================================================ */
+
+showMainMenu();
+
+requestAnimationFrame(
+    gameLoop
+);
+
+</script>
+
+</body>
+</html>
