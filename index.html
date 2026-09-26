@@ -1212,7 +1212,7 @@ body {
 
 <div id="gameOver">
 
-    <h1>
+    <h1 id="gameOverTitle">
         GAME OVER
     </h1>
 
@@ -1309,6 +1309,8 @@ const finalScore =
     document.getElementById(
         "finalScore"
     );
+
+const gameOverTitle = document.getElementById("gameOverTitle");
 
 const restartButton =
     document.getElementById(
@@ -1560,9 +1562,17 @@ function connectOnlineMatch() {
             enemy.weapon = weapons[message.weaponKey] || weapons.pistol;
             enemy.alive = message.alive;
         }
-        if (message.type === "hit" && onlineReady) {
-            player.health = Math.max(0, player.health - message.damage);
-            if (player.health === 0) endGame();
+        if (message.type === "hit" && onlineReady && !gameOver) {
+            const damage = Number(message.damage) || 0;
+            player.health = Math.max(0, player.health - damage);
+            updateHUD();
+            if (player.health === 0) {
+                endGame("ELIMINATED", "Your opponent won this round.");
+                sendOnline({ type: "defeated" });
+            }
+        }
+        if (message.type === "defeated" && onlineReady && !gameOver) {
+            endGame("VICTORY", "Your opponent was eliminated.");
         }
         if (message.type === "opponentLeft") {
             onlineReady = false;
@@ -5861,7 +5871,7 @@ function updateHUD() {
    END GAME
    ============================================================ */
 
-function endGame() {
+function endGame(title = "GAME OVER", message = "Score: " + score) {
 
     if (
         gameOver
@@ -5883,9 +5893,8 @@ function endGame() {
     hideReloadUI();
 
 
-    finalScore.textContent =
-        "Score: " +
-        score;
+    gameOverTitle.textContent = title;
+    finalScore.textContent = message;
 
 
     gameOverScreen.style.display =
@@ -5906,6 +5915,7 @@ function restartGame() {
 
     gameOver = false;
     mouseDown = false;
+    gameOverTitle.textContent = "GAME OVER";
 
     // Keep the score between rounds.
     // Only the player/enemy state is reset.

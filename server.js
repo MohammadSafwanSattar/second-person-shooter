@@ -53,7 +53,7 @@ wss.on("connection", (socket) => {
 
         try {
             const message = JSON.parse(rawMessage);
-            if (["state", "hit"].includes(message.type)) send(opponent, message);
+            if (["state", "hit", "defeated"].includes(message.type)) send(opponent, message);
         } catch {
             // Ignore malformed client messages.
         }
