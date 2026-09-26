@@ -1562,17 +1562,21 @@ function connectOnlineMatch() {
             enemy.weapon = weapons[message.weaponKey] || weapons.pistol;
             enemy.alive = message.alive;
         }
-        if (message.type === "hit" && onlineReady && !gameOver) {
-            const damage = Number(message.damage) || 0;
-            player.health = Math.max(0, player.health - damage);
+        if (message.type === "damage" && onlineReady && !gameOver) {
+            player.health = Math.max(0, Number(message.health) || 0);
+            player.maxHealth = Math.max(1, Number(message.maxHealth) || player.maxHealth);
             updateHUD();
             if (player.health === 0) {
                 endGame("ELIMINATED", "Your opponent won this round.");
-                sendOnline({ type: "defeated" });
             }
         }
-        if (message.type === "defeated" && onlineReady && !gameOver) {
-            endGame("VICTORY", "Your opponent was eliminated.");
+        if (message.type === "opponentHealth" && onlineReady) {
+            enemy.health = Math.max(0, Number(message.health) || 0);
+            enemy.maxHealth = Math.max(1, Number(message.maxHealth) || enemy.maxHealth);
+            updateHUD();
+        }
+        if (message.type === "gameResult" && onlineReady && !gameOver) {
+            endGame(message.result, message.message);
         }
         if (message.type === "opponentLeft") {
             onlineReady = false;

@@ -27,6 +27,7 @@ const server = http.createServer((request, response) => {
 const wss = new WebSocketServer({ server });
 let waitingPlayer = null;
 const opponents = new Map();
+const playerStates = new Map();
 
 function send(socket, message) {
     if (socket && socket.readyState === socket.OPEN) {
@@ -40,6 +41,8 @@ wss.on("connection", (socket) => {
         waitingPlayer = null;
         opponents.set(firstPlayer, socket);
         opponents.set(socket, firstPlayer);
+        playerStates.set(firstPlayer, { health: 100, maxHealth: 100, alive: true });
+        playerStates.set(socket, { health: 100, maxHealth: 100, alive: true });
         send(firstPlayer, { type: "matched", role: 1 });
         send(socket, { type: "matched", role: 2 });
     } else {
@@ -53,7 +56,34 @@ wss.on("connection", (socket) => {
 
         try {
             const message = JSON.parse(rawMessage);
-            if (["state", "hit", "defeated"].includes(message.type)) send(opponent, message);
+            if (message.type === "state") {
+                const health = Number(message.health);
+                const maxHealth = Number(message.maxHealth);
+                playerStates.set(socket, {
+                    health: Number.isFinite(health) ? health : 100,
+                    maxHealth: Number.isFinite(maxHealth) ? maxHealth : 100,
+                    alive: message.alive !== false
+                });
+                send(opponent, message);
+            }
+
+            if (message.type === "hit") {
+                const targetState = playerStates.get(opponent) || { health: 100, maxHealth: 100, alive: true };
+                if (!targetState.alive) return;
+
+                const damage = Math.max(0, Math.min(Number(message.damage) || 0, 150));
+                targetState.health = Math.max(0, targetState.health - damage);
+                targetState.alive = targetState.health > 0;
+                playerStates.set(opponent, targetState);
+
+                send(opponent, { type: "damage", health: targetState.health, maxHealth: targetState.maxHealth });
+                send(socket, { type: "opponentHealth", health: targetState.health, maxHealth: targetState.maxHealth });
+
+                if (!targetState.alive) {
+                    send(opponent, { type: "gameResult", result: "ELIMINATED", message: "Your opponent won this round." });
+                    send(socket, { type: "gameResult", result: "VICTORY", message: "Your opponent was eliminated." });
+                }
+            }
         } catch {
             // Ignore malformed client messages.
         }
@@ -67,6 +97,7 @@ wss.on("connection", (socket) => {
             send(opponent, { type: "opponentLeft" });
         }
         opponents.delete(socket);
+        playerStates.delete(socket);
     });
 });
 
