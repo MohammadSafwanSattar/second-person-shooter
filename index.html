@@ -789,37 +789,6 @@ body {
 .weaponSkinButton:hover, .weaponSkinButton.selected { border-color: #fff; transform: translateY(-2px); }
 @media (max-width: 420px) { .statGrid { grid-template-columns: 1fr; } .statCard { min-height: auto; } }
 
-
-
-/* LIVE SERVER COUNTERS */
-#liveCounters {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
-    padding: 13px 16px;
-    color: #eaf2ff;
-    background: rgba(10, 16, 27, 0.88);
-    border: 1px solid rgba(130, 170, 220, 0.35);
-    border-radius: 12px;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.28);
-    font: 700 11px/1.3 Arial, sans-serif;
-    letter-spacing: 0.7px;
-    pointer-events: none;
-}
-#liveCounters > div { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-#liveCounters strong { margin-left: auto; min-width: 22px; text-align: right; font-size: 14px; color: #ffffff; }
-.counterDot { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: #49e59b; box-shadow: 0 0 9px rgba(73,229,155,.7); }
-.counterDot.gameDot { background: #64b5ff; box-shadow: 0 0 9px rgba(100,181,255,.7); }
-.counterDot.matchDot { background: #ffc45e; box-shadow: 0 0 9px rgba(255,196,94,.7); }
-@media (max-width: 600px) {
-    #liveCounters { top: 8px; right: 8px; padding: 9px 11px; gap: 6px; font-size: 9px; }
-    #liveCounters strong { font-size: 12px; }
-}
-
 </style>
 </head>
 
@@ -980,12 +949,6 @@ body {
     <button class="menuButton" id="offlineModeButton">OFFLINE MODE</button>
     <button class="menuButton" id="customizeButton">CHARACTER</button>
     <div class="menuNote">Online 1v1 automatically pairs you with the next player in the queue.</div>
-</div>
-
-<div id="liveCounters" aria-live="polite">
-    <div><span class="counterDot"></span> WEBSITE ONLINE <strong id="websiteCount">0</strong></div>
-    <div><span class="counterDot gameDot"></span> PLAYERS IN GAME <strong id="playingCount">0</strong></div>
-    <div><span class="counterDot matchDot"></span> ONLINE MATCHES <strong id="matchCount">0</strong></div>
 </div>
 
 <div id="onlineMenu" class="menuOverlay" style="display:none;">
@@ -1403,44 +1366,6 @@ let onlineSocket = null;
 let onlineMode = false;
 let onlineReady = false;
 let onlineRole = 1;
-
-// A separate connection keeps website statistics live without entering matchmaking.
-let statsSocket = null;
-let currentlyPlaying = false;
-
-function setPlayingStatus(isPlaying) {
-    currentlyPlaying = Boolean(isPlaying);
-    if (statsSocket && statsSocket.readyState === WebSocket.OPEN) {
-        statsSocket.send(JSON.stringify({ type: "presence", playing: currentlyPlaying }));
-    }
-}
-
-function connectStats() {
-    const protocol = location.protocol === "https:" ? "wss:" : "ws:";
-    statsSocket = new WebSocket(protocol + "//" + location.host);
-    statsSocket.addEventListener("open", function() {
-        statsSocket.send(JSON.stringify({ type: "presence", playing: currentlyPlaying }));
-    });
-    statsSocket.addEventListener("message", function(event) {
-        let message;
-        try { message = JSON.parse(event.data); } catch { return; }
-        if (message.type !== "stats") return;
-        document.getElementById("websiteCount").textContent = message.visitors ?? 0;
-        document.getElementById("playingCount").textContent = message.playing ?? 0;
-        document.getElementById("matchCount").textContent = message.matches ?? 0;
-    });
-    statsSocket.addEventListener("close", function() {
-        document.getElementById("websiteCount").textContent = "—";
-        document.getElementById("playingCount").textContent = "—";
-        document.getElementById("matchCount").textContent = "—";
-        // Retry the statistics connection if the server temporarily disconnects.
-        window.setTimeout(connectStats, 3000);
-    });
-    statsSocket.addEventListener("error", function() {
-        // The close handler retries if the server is unavailable.
-    });
-}
-
 const playerAppearance = {
     armor: "#247fc1",
     skin: "#d99a70",
@@ -1581,7 +1506,6 @@ function setDifficulty(level) {
 }
 
 function showMainMenu() {
-    setPlayingStatus(false);
     leaveOnlineMatch();
     mainMenu.style.display = "flex";
     difficultyMenu.style.display = "none";
@@ -1599,7 +1523,6 @@ function sendOnline(message) {
 }
 
 function leaveOnlineMatch() {
-    setPlayingStatus(false);
     onlineMode = false;
     onlineReady = false;
     if (onlineSocket) onlineSocket.close();
@@ -1618,7 +1541,6 @@ function connectOnlineMatch() {
 
     onlineSocket.addEventListener("open", function() {
         onlineStatus.textContent = "FINDING OPPONENT...";
-        onlineSocket.send(JSON.stringify({ type: "joinQueue" }));
     });
 
     onlineSocket.addEventListener("message", function(event) {
@@ -1627,7 +1549,6 @@ function connectOnlineMatch() {
         if (message.type === "matched") {
             onlineRole = message.role;
             onlineReady = true;
-            setPlayingStatus(true);
             onlineMenu.style.display = "none";
             restartGame();
         }
@@ -1659,7 +1580,6 @@ function connectOnlineMatch() {
         }
         if (message.type === "opponentLeft") {
             onlineReady = false;
-            setPlayingStatus(false);
             onlineStatus.textContent = "OPPONENT DISCONNECTED";
             onlineMenu.style.display = "flex";
         }
@@ -1721,7 +1641,6 @@ document.getElementById("backToMainMenu").addEventListener("click", showMainMenu
 document.querySelectorAll("[data-difficulty]").forEach(function(button) {
     button.addEventListener("click", function() {
         setDifficulty(button.dataset.difficulty);
-        setPlayingStatus(true);
         difficultyMenu.style.display = "none";
         // Start a clean round so stale game-over/death state cannot carry
         // over when the player changes difficulty.
@@ -5969,7 +5888,6 @@ function endGame(title = "GAME OVER", message = "Score: " + score) {
 
     gameOver =
         true;
-    setPlayingStatus(false);
 
 
     mouseDown =
@@ -5994,7 +5912,6 @@ function endGame(title = "GAME OVER", message = "Score: " + score) {
    ============================================================ */
 
 function restartGame() {
-    setPlayingStatus(true);
 
     /* --------------------------------------------------------
        FULL NEW-ROUND RESET
@@ -6079,7 +5996,6 @@ document.getElementById("gameOverBackButton").addEventListener("click", function
     selectingWeapon = false;
     gameOver = false;
 });
-
 
 
 /* ============================================================
@@ -6215,7 +6131,6 @@ function gameLoop(
    ============================================================ */
 
 showMainMenu();
-connectStats();
 
 requestAnimationFrame(
     gameLoop

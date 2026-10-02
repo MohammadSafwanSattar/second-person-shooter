@@ -5,47 +5,27 @@ const path = require("path");
 const { WebSocketServer } = require("ws");
 
 const server = http.createServer((request, response) => {
-    const pathname = decodeURIComponent(
-        new URL(request.url, `http://${request.headers.host}`).pathname
-    );
+    const filePath = request.url === "/" ? "index.html" : request.url.slice(1);
 
-    const filePath = pathname === "/"
-        ? path.join(__dirname, "index.html")
-        : path.resolve(__dirname, "." + pathname);
+    const resolvedPath = path.join(__dirname, filePath);
 
-    if (
-        !filePath.startsWith(__dirname + path.sep) &&
-        filePath !== path.join(__dirname, "index.html")
-    ) {
+    if (!resolvedPath.startsWith(__dirname)) {
         response.writeHead(403);
         response.end("Forbidden");
         return;
     }
 
-    fs.readFile(filePath, (error, file) => {
+    fs.readFile(resolvedPath, (error, file) => {
         if (error) {
             response.writeHead(404);
             response.end("Not found");
             return;
         }
 
-        const ext = path.extname(filePath).toLowerCase();
-
-        const contentTypes = {
-            ".html": "text/html; charset=utf-8",
-            ".css": "text/css; charset=utf-8",
-            ".js": "application/javascript; charset=utf-8",
-            ".png": "image/png",
-            ".jpg": "image/jpeg",
-            ".jpeg": "image/jpeg",
-            ".gif": "image/gif",
-            ".svg": "image/svg+xml",
-            ".ico": "image/x-icon",
-            ".json": "application/json"
-        };
-
         response.writeHead(200, {
-            "Content-Type": contentTypes[ext] || "application/octet-stream"
+            "Content-Type": filePath.endsWith(".html")
+                ? "text/html"
+                : "text/plain"
         });
 
         response.end(file);
@@ -57,45 +37,19 @@ const wss = new WebSocketServer({ server });
 let waitingPlayer = null;
 
 const opponents = new Map();
+
 const playerStates = new Map();
 
-// Track every connected browser using the WebSocket.
-const visitors = new Set();
-
-// Track visitors who have entered a game.
-const playersInGame = new Set();
-
 function send(socket, message) {
-    if (socket && socket.readyState === 1) {
+    if (socket && socket.readyState === socket.OPEN) {
         socket.send(JSON.stringify(message));
     }
 }
 
-function getCounts() {
-    return {
-        type: "liveCounts",
-        visitors: visitors.size,
-        playersInGame: playersInGame.size,
-        onlineMatches: Math.floor(opponents.size / 2)
-    };
-}
-
-function broadcastCounts() {
-    const counts = getCounts();
-
-    for (const socket of wss.clients) {
-        send(socket, counts);
-    }
-}
-
 wss.on("connection", (socket) => {
-    visitors.add(socket);
-
-    // Send the current counts to everyone.
-    broadcastCounts();
-
-    if (waitingPlayer && waitingPlayer.readyState === 1) {
+    if (waitingPlayer) {
         const firstPlayer = waitingPlayer;
+
         waitingPlayer = null;
 
         opponents.set(firstPlayer, socket);
@@ -115,33 +69,19 @@ wss.on("connection", (socket) => {
 
         send(firstPlayer, { type: "matched", role: 1 });
         send(socket, { type: "matched", role: 2 });
-
-        broadcastCounts();
     } else {
         waitingPlayer = socket;
+
         send(socket, { type: "waiting" });
     }
 
     socket.on("message", (rawMessage) => {
+        const opponent = opponents.get(socket);
+
+        if (!opponent) return;
+
         try {
             const message = JSON.parse(rawMessage);
-
-            // The website must send this when a player
-            // enters or leaves an offline or online game.
-            if (message.type === "gameStatus") {
-                if (message.playing === true) {
-                    playersInGame.add(socket);
-                } else {
-                    playersInGame.delete(socket);
-                }
-
-                broadcastCounts();
-                return;
-            }
-
-            const opponent = opponents.get(socket);
-
-            if (!opponent) return;
 
             if (message.type === "state") {
                 const health = Number(message.health);
@@ -176,6 +116,7 @@ wss.on("connection", (socket) => {
                 );
 
                 targetState.alive = targetState.health > 0;
+
                 playerStates.set(opponent, targetState);
 
                 send(opponent, {
@@ -205,36 +146,31 @@ wss.on("connection", (socket) => {
                 }
             }
         } catch {
-            // Ignore malformed messages.
+            // Ignore malformed client messages.
         }
     });
 
     socket.on("close", () => {
-        visitors.delete(socket);
-        playersInGame.delete(socket);
-
-        if (waitingPlayer === socket) {
-            waitingPlayer = null;
-        }
+        if (waitingPlayer === socket) waitingPlayer = null;
 
         const opponent = opponents.get(socket);
 
         if (opponent) {
             opponents.delete(opponent);
-            playerStates.delete(opponent);
 
             send(opponent, { type: "opponentLeft" });
         }
 
         opponents.delete(socket);
-        playerStates.delete(socket);
 
-        broadcastCounts();
+        playerStates.delete(socket);
     });
 });
 
 const port = process.env.PORT || 3000;
 
 server.listen(port, "0.0.0.0", () => {
-    console.log(`Second Person Shooter running on port ${port}`);
+    console.log(
+        `Second Person Shooter running on http://localhost:${port}`
+    );
 });
